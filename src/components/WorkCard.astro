@@ -1,0 +1,21 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  category: string;
+  summary: string;
+  cover: string;
+}
+
+const { href, title, category, summary, cover } = Astro.props;
+---
+
+<a class="work-card" href={href}>
+  <img src={cover} alt={title} loading="lazy" />
+  <div class="card-copy">
+    <span class="card-kicker">{category}</span>
+    <h3>{title}</h3>
+    <p>{summary}</p>
+    <strong class="card-link">查看项目详情</strong>
+  </div>
+</a>

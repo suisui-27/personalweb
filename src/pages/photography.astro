@@ -1,0 +1,27 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { photographyItems } from "../data/photography";
+---
+
+<BaseLayout title="摄影 | 个人作品集">
+  <main>
+    <section class="photo-section" aria-labelledby="photo-title">
+      <div class="photo-copy">
+        <p class="eyebrow">Photography</p>
+        <h1 id="photo-title">摄影</h1>
+        <p>旅途、风景和空间记录。图片数据已从脚本中拆出，后续可以平滑迁移到 MDX。</p>
+      </div>
+      <div class="photo-immersive">
+        {photographyItems.map((photo) => (
+          <article class="photo-card">
+            <img src={photo.src} alt={photo.place} loading="lazy" />
+            <div class="place-tag">
+              <span>{photo.note}</span>
+              <strong>{photo.place}</strong>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>

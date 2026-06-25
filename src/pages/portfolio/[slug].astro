@@ -1,0 +1,44 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("portfolio");
+  return entries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry }
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={`${entry.data.title} | 作品`} description={entry.data.summary}>
+  <main>
+    <section class="article-hero">
+      <div>
+        <p class="eyebrow">{entry.data.category} / {entry.data.year}</p>
+        <h1>{entry.data.title}</h1>
+        <p class="muted">{entry.data.summary}</p>
+        <div class="tag-list">
+          {entry.data.tags.map((tag) => <span>{tag}</span>)}
+        </div>
+      </div>
+      <img src={entry.data.cover} alt={entry.data.title} />
+    </section>
+    <article class="article-body">
+      <Content />
+    </article>
+    {entry.data.gallery.length > 0 && (
+      <section class="gallery" aria-label="项目详情图">
+        {entry.data.gallery.map((image) => (
+          <figure>
+            <img src={image.src} alt={image.caption} loading="lazy" />
+            <figcaption>{image.caption}</figcaption>
+          </figure>
+        ))}
+      </section>
+    )}
+  </main>
+</BaseLayout>

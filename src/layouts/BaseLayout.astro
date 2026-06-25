@@ -1,0 +1,50 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "个人作品集 | 工业设计与机械工程",
+  description = "工业设计、机械工程、视觉设计、摄影与阶段性博客记录。"
+} = Astro.props;
+
+const navItems = [
+  ["/portfolio/", "作品"],
+  ["/blog/", "博客"],
+  ["/photography/", "摄影"],
+  ["/honors/", "荣誉"]
+];
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="/" aria-label="回到首页">
+          <span class="brand-mark">ID</span>
+          <span>Design x Engineering</span>
+        </a>
+        <nav class="site-nav" aria-label="主导航">
+          {navItems.map(([href, label]) => (
+            <a href={href} aria-current={Astro.url.pathname === href ? "page" : undefined}>{label}</a>
+          ))}
+        </nav>
+      </header>
+      <slot />
+      <footer class="site-footer">
+        <span>Personal Portfolio</span>
+        <span>Designed for clarity, atmosphere, and future updates.</span>
+      </footer>
+    </div>
+  </body>
+</html>
