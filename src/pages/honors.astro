@@ -1,0 +1,29 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { honorItems } from "../data/honors";
+---
+
+<BaseLayout title="荣誉 | 个人作品集">
+  <main>
+    <section class="section blue">
+      <div class="section-head">
+        <p class="eyebrow">Awards & Recognition</p>
+        <h1>荣誉奖项</h1>
+        <p>竞赛奖项与奖学金记录。正式发布内容改为代码/MDX 管理，不再依赖浏览器本地上传。</p>
+      </div>
+      <div class="honor-list">
+        {honorItems.map((honor, index) => (
+          <article class="honor-card">
+            <div class="honor-index">{String(index + 1).padStart(2, "0")}</div>
+            <div class="honor-copy">
+              <span>{honor.year}</span>
+              <h3>{honor.title}</h3>
+              <p>{honor.category}</p>
+            </div>
+            <img src={honor.src} alt={honor.title} loading="lazy" />
+          </article>
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>
