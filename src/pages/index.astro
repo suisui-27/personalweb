@@ -1,8 +1,10 @@
+
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import WorkCard from "../components/WorkCard.astro";
 import ThreeAccent from "../components/ThreeAccent";
+import PosterCarousel from "../components/PosterCarousel";
 import { photographyItems } from "../data/photography";
 import { honorItems } from "../data/honors";
 import { posterItems } from "../data/posters";
@@ -10,12 +12,8 @@ import { posterItems } from "../data/posters";
 const portfolio = (await getCollection("portfolio"))
   .sort((a, b) => Number(b.data.featured) - Number(a.data.featured))
   .slice(0, 6);
-const posts = (await getCollection("posts"))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 2);
-const photos = photographyItems.slice(0, 5);
-const honors = honorItems.slice(0, 3);
-const posters = posterItems.slice(0, 5);
+const photos = photographyItems;
+const honors = honorItems;
 ---
 
 <BaseLayout>
@@ -27,35 +25,21 @@ const posters = posterItems.slice(0, 5);
         <p class="eyebrow">Industrial Design / Mechanical Engineering</p>
         <h1 id="hero-title">把设计直觉落到<br />可验证的工程细节</h1>
         <p>
-          本科工业设计，研究生机械工程。这个网站整理产品设计、校园官网视觉、摄影作品、阶段性荣誉与博客记录，
+          本科工业设计，研究生机械工程。这个网站整理产品设计、校园官网视觉、摄影作品与阶段性荣誉，
           既保留设计表达，也强调结构、逻辑和可持续更新。
         </p>
         <div class="hero-actions">
           <a class="button primary" href="/portfolio/">查看作品</a>
-          <a class="button ghost" href="/blog/">阅读博客</a>
+          <a class="button ghost" href="/photography/">查看摄影</a>
         </div>
       </div>
     </section>
 
-    <section class="intro-band" aria-label="个人定位">
-      <div>
-        <span>专业背景</span>
-        <strong>工业设计 -> 机械工程</strong>
-      </div>
-      <div>
-        <span>能力关键词</span>
-        <strong>产品思维 / 视觉系统 / 结构意识</strong>
-      </div>
-      <div>
-        <span>作品类型</span>
-        <strong>3D 建模、界面、海报、摄影</strong>
-      </div>
-    </section>
 
     <section class="section" aria-labelledby="portfolio-title">
       <div class="section-head">
         <p class="eyebrow">Product & System</p>
-        <h2 id="portfolio-title">工业设计作品</h2>
+        <h2 id="portfolio-title">工业设计</h2>
         <p>以问题定义、功能推演和形态表达为主线。每个项目都可以独立补充正文、详情图和设计说明。</p>
       </div>
       <div class="card-grid">
@@ -77,17 +61,7 @@ const posters = posterItems.slice(0, 5);
         <h2 id="poster-title">平面设计</h2>
         <p>学校新闻网站助管期间参与设计的海报，按节庆、校庆、专题宣传和新闻栏目组织展示。</p>
       </div>
-      <div class="poster-grid">
-        {posters.map((poster) => (
-          <figure class="poster-card">
-            <img src={poster.src} alt={poster.title} loading="lazy" />
-            <figcaption>
-              <span>{poster.category}</span>
-              <strong>{poster.title}</strong>
-            </figcaption>
-          </figure>
-        ))}
-      </div>
+      <PosterCarousel items={posterItems} client:visible />
     </section>
 
     <section class="photo-section" aria-labelledby="photo-title">
@@ -126,27 +100,6 @@ const posters = posterItems.slice(0, 5);
             </div>
             <img src={honor.src} alt={honor.title} loading="lazy" />
           </article>
-        ))}
-      </div>
-    </section>
-
-    <section class="section" aria-labelledby="blog-title">
-      <div class="section-head">
-        <p class="eyebrow">Notes</p>
-        <h2 id="blog-title">博客记录</h2>
-        <p>记录项目复盘、工具链、视觉系统和设计工程之间的阶段性思考。</p>
-      </div>
-      <div class="card-grid">
-        {posts.map((post) => (
-          <a class="post-card" href={`/blog/${post.slug}/`}>
-            {post.data.cover && <img src={post.data.cover} alt={post.data.title} loading="lazy" />}
-            <div class="card-copy">
-              <span class="card-kicker">{post.data.date.toLocaleDateString("zh-CN")}</span>
-              <h3>{post.data.title}</h3>
-              <p>{post.data.summary}</p>
-              <strong class="card-link">阅读文章</strong>
-            </div>
-          </a>
         ))}
       </div>
     </section>
