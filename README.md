@@ -1,4 +1,4 @@
-# Personal Web / 个人展示博客网站
+# Personal Web / 个人展示网站
 
 <img src="public/assets/readme/cover.jpg" alt="README cover" width="284">
 
@@ -6,9 +6,9 @@
 
 ---
 
-A static personal portfolio and blog built with Astro, React, MDX, and a light Three.js accent. The project is organized for long-term content updates: pages, components, content, data, and assets are separated by responsibility.
+A static personal portfolio built with Astro, React, MDX, and a light Three.js accent. The project is organized for long-term content updates: pages, components, content, data, and assets are separated by responsibility.
 
-这是一个基于 Astro、React、MDX 和轻量 Three.js 点缀的静态个人展示博客网站。项目目标是长期维护：页面、组件、内容、数据和资源按职责拆开，不再把所有内容写进一个 HTML/CSS/JS 文件里。
+这是一个基于 Astro、React、MDX 和轻量 Three.js 点缀的静态个人展示网站。项目目标是长期维护：页面、组件、内容、数据和资源按职责拆开，不再把所有内容写进一个 HTML/CSS/JS 文件里。
 
 ## Install And Run / 安装与启动
 
@@ -45,7 +45,6 @@ src/
   components/        Reusable UI and interactive components / 可复用 UI 与交互组件
   content/
     portfolio/       Portfolio MDX entries / 作品 MDX 内容
-    posts/           Blog MDX entries / 博客 MDX 内容
   data/              Structured list data / 结构化列表数据
   layouts/           Shared page shell / 全站布局
   pages/             Static routes / 静态路由
@@ -53,7 +52,6 @@ src/
 public/assets/
   readme/            README images / README 图片
   hero/              Homepage hero images / 首页首屏图片
-  blog/              Blog cover images / 博客封面
   portfolio/         Portfolio project assets / 作品资源
   posters/           Poster design images / 平面海报
   photography/       Photography images / 摄影照片
@@ -121,11 +119,6 @@ public/assets/portfolio/bike-shuttle-robot/render.jpg
 public/assets/portfolio/bike-shuttle-robot/exploded-view.jpg
 ```
 
-### Blog / 博客
-
-Add blog posts in `src/content/posts/`. Put cover images in `public/assets/blog/`.
-
-新增博客请放在 `src/content/posts/`。博客封面图片放在 `public/assets/blog/`。
 
 ### Photography / 摄影
 
@@ -151,7 +144,6 @@ Edit `src/data/honors.ts` to change awards. Put images in `public/assets/honors/
 - Work cards: `src/components/WorkCard.astro`
 - Homepage and section order: `src/pages/index.astro`
 - Portfolio list and detail pages: `src/pages/portfolio/`
-- Blog list and detail pages: `src/pages/blog/`
 - Photography page: `src/pages/photography.astro`
 - Honors page: `src/pages/honors.astro`
 - Global spacing, colors, typography, image layout: `src/styles/global.css`
@@ -161,7 +153,6 @@ Edit `src/data/honors.ts` to change awards. Put images in `public/assets/honors/
 - 作品卡片：`src/components/WorkCard.astro`
 - 首页和板块顺序：`src/pages/index.astro`
 - 作品列表和详情页：`src/pages/portfolio/`
-- 博客列表和详情页：`src/pages/blog/`
 - 摄影页面：`src/pages/photography.astro`
 - 荣誉页面：`src/pages/honors.astro`
 - 全局间距、颜色、字体、图片布局：`src/styles/global.css`

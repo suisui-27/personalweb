@@ -11,7 +11,9 @@ const { href, title, category, summary, cover } = Astro.props;
 ---
 
 <a class="work-card" href={href}>
-  <img src={cover} alt={title} loading="lazy" />
+  <div class="work-card-media">
+    <img src={cover} alt={title} loading="lazy" />
+  </div>
   <div class="card-copy">
     <span class="card-kicker">{category}</span>
     <h3>{title}</h3>

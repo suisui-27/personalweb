@@ -6,6 +6,12 @@ export const honorItems = [
     year: "2025"
   },
   {
+    src: "/assets/honors/2025-industrial-design-award-list.jpg",
+    title: "2025 工业设计大赛获奖名单",
+    category: "文档材料",
+    year: "2025"
+  },
+  {
     src: "/assets/honors/2024-advertising-art-second.jpg",
     title: "2024 年全国大学生广告艺术大赛北京市二等奖",
     category: "设计竞赛",
