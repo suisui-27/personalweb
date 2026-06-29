@@ -1,10 +1,12 @@
 import { defineCollection, z } from "astro:content";
+import type { PortfolioCategory } from "../data/types";
 
+/** Portfolio 内容集合 schema —— 对应 data-model.md 中的 PortfolioItem */
 const portfolio = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
-    category: z.string(),
+    category: z.string() as z.ZodType<PortfolioCategory>,
     cover: z.string(),
     summary: z.string(),
     year: z.string(),
@@ -14,11 +16,11 @@ const portfolio = defineCollection({
       .array(
         z.object({
           src: z.string(),
-          caption: z.string()
+          caption: z.string(),
         })
       )
-      .default([])
-  })
+      .default([]),
+  }),
 });
 
 export const collections = { portfolio };

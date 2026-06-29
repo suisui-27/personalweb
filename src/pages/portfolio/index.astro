@@ -2,18 +2,21 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import WorkCard from "../../components/WorkCard.astro";
+import PageHeader from "../../components/PageHeader.astro";
 
-const portfolio = (await getCollection("portfolio")).sort((a, b) => b.data.year.localeCompare(a.data.year));
+const portfolio = (await getCollection("portfolio")).sort((a, b) =>
+  b.data.year.localeCompare(a.data.year)
+);
 ---
 
-<BaseLayout title="作品 | 个人作品集">
+<BaseLayout title="工业产品 | 个人作品集">
   <main>
     <section class="section">
-      <div class="section-head">
-        <p class="eyebrow">Portfolio</p>
-        <h1>作品</h1>
-        <p>工业设计、界面、产品概念和 3D 模型项目。新增作品时，只需要添加一篇 MDX 内容文件。</p>
-      </div>
+      <PageHeader
+        eyebrow="Product & System"
+        title="工业产品"
+        description="工业设计、界面、产品概念和 3D 模型项目。每个项目包含封面、摘要、标签和详情图廊。"
+      />
       <div class="card-grid">
         {portfolio.map((item) => (
           <WorkCard

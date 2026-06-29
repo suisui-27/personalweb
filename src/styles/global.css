@@ -862,3 +862,177 @@ h3 {
     font-size: 20px;
   }
 }
+
+/* ── View all link ── */
+.view-all {
+  display: inline-block;
+  margin-top: 28px;
+  color: var(--red);
+  font-size: 14px;
+  font-weight: 800;
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+.view-all:hover {
+  transform: translateX(4px);
+  color: var(--ink);
+}
+
+/* ── About Page ── */
+.page-head {
+  margin-bottom: 40px;
+}
+
+.back-home {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  transition: color 180ms ease;
+}
+
+.back-home:hover {
+  color: var(--red);
+}
+
+.about-hero {
+  padding: clamp(58px, 9vw, 112px) clamp(18px, 4vw, 52px) clamp(36px, 5vw, 64px);
+}
+
+.about-hero-inner {
+  width: min(820px, 100%);
+}
+
+.about-tagline {
+  color: var(--muted);
+  font-size: clamp(16px, 2vw, 22px);
+  line-height: 1.5;
+}
+
+.about-body {
+  width: min(820px, calc(100% - 36px));
+  margin: 0 auto;
+  padding: 0 0 clamp(58px, 9vw, 112px);
+}
+
+.about-bio {
+  margin-bottom: 48px;
+}
+
+.about-bio p {
+  margin-bottom: 16px;
+  color: #3f403e;
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.about-section-block {
+  margin-bottom: 48px;
+}
+
+.about-block-title {
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: clamp(22px, 3vw, 32px);
+}
+
+/* Timeline */
+.about-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.about-timeline-item {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 20px;
+  align-items: baseline;
+}
+
+.about-timeline-period {
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.about-timeline-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.about-timeline-content strong {
+  font-size: 17px;
+}
+
+.about-timeline-content span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Skills */
+.about-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.about-skill-group {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 16px;
+  align-items: baseline;
+}
+
+.about-skill-cat {
+  color: var(--red);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.about-skill-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.about-skill-tag {
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Interests */
+.about-interests {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.about-interest-tag {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ── About Page Responsive ── */
+@media (max-width: 720px) {
+  .about-timeline-item {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .about-skill-group {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}

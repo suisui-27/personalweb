@@ -3,13 +3,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { photographyItems } from "../data/photography";
 ---
 
-<BaseLayout title="摄影 | 个人作品集">
+<BaseLayout title="摄影作品 | 个人作品集">
   <main>
-    <section class="photo-section" aria-labelledby="photo-title">
-      <div class="photo-copy">
-        <p class="eyebrow">Photography</p>
-        <h1 id="photo-title">摄影</h1>
-        <p>旅途、风景和空间记录。图片数据已从脚本中拆出，后续可以平滑迁移到 MDX。</p>
+    <section class="photo-section">
+      <div class="photo-copy section-head page-head">
+        <p class="eyebrow">Immersive Photography</p>
+        <h1>摄影作品</h1>
+        <p>旅途、风景和空间记录。照片以拍摄地命名，用横向沉浸式画廊让风景本身成为第一视觉。</p>
       </div>
       <div class="photo-immersive">
         {photographyItems.map((photo) => (

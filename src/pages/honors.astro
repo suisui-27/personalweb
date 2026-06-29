@@ -1,16 +1,17 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHeader from "../components/PageHeader.astro";
 import { honorItems } from "../data/honors";
 ---
 
-<BaseLayout title="荣誉 | 个人作品集">
+<BaseLayout title="个人成长 | 个人作品集">
   <main>
-    <section class="section blue">
-      <div class="section-head">
-        <p class="eyebrow">Awards & Recognition</p>
-        <h1>荣誉奖项</h1>
-        <p>竞赛奖项与奖学金记录。正式发布内容改为代码/MDX 管理，不再依赖浏览器本地上传。</p>
-      </div>
+    <section class="section">
+      <PageHeader
+        eyebrow="Awards & Recognition"
+        title="个人成长"
+        description="竞赛奖项与奖学金记录，作为设计与工程学习路径的旁证。"
+      />
       <div class="honor-list">
         {honorItems.map((honor, index) => (
           <article class="honor-card">

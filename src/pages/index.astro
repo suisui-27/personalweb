@@ -1,107 +1,357 @@
-
 ---
-import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import WorkCard from "../components/WorkCard.astro";
-import ThreeAccent from "../components/ThreeAccent";
-import PosterCarousel from "../components/PosterCarousel";
-import { photographyItems } from "../data/photography";
-import { honorItems } from "../data/honors";
-import { posterItems } from "../data/posters";
 
-const portfolio = (await getCollection("portfolio"))
-  .sort((a, b) => Number(b.data.featured) - Number(a.data.featured))
-  .slice(0, 6);
-const photos = photographyItems;
-const honors = honorItems;
+const entries = [
+  { href: "/portfolio/", label: "工业产品" },
+  { href: "/posters/", label: "平面设计" },
+  { href: "/photography/", label: "摄影作品" },
+  { href: "/honors/", label: "个人成长" },
+];
 ---
 
-<BaseLayout>
-  <main>
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-media" aria-hidden="true"></div>
-      <ThreeAccent client:visible />
-      <div class="hero-copy">
-        <p class="eyebrow">Industrial Design / Mechanical Engineering</p>
-        <h1 id="hero-title">把设计直觉落到<br />可验证的工程细节</h1>
-        <p>
-          本科工业设计，研究生机械工程。这个网站整理产品设计、校园官网视觉、摄影作品与阶段性荣誉，
-          既保留设计表达，也强调结构、逻辑和可持续更新。
-        </p>
-        <div class="hero-actions">
-          <a class="button primary" href="/portfolio/">查看作品</a>
-          <a class="button ghost" href="/photography/">查看摄影</a>
-        </div>
-      </div>
-    </section>
+<BaseLayout title="个人作品集 | 设计与工程">
+  <main class="landing">
+    <div class="landing-media" aria-hidden="true"></div>
+    <div class="landing-overlay" aria-hidden="true"></div>
 
-
-    <section class="section" aria-labelledby="portfolio-title">
-      <div class="section-head">
-        <p class="eyebrow">Product & System</p>
-        <h2 id="portfolio-title">工业设计</h2>
-        <p>以问题定义、功能推演和形态表达为主线。每个项目都可以独立补充正文、详情图和设计说明。</p>
+    <div class="landing-content">
+      <div class="landing-head">
+        <p class="landing-eyebrow">Industrial Design / Mechanical Engineering</p>
+        <h1 class="landing-title">
+          <span class="title-line title-line-left">把设计直觉落到</span>
+          <span class="title-line title-line-right">可验证的工程细节</span>
+        </h1>
       </div>
-      <div class="card-grid">
-        {portfolio.map((item) => (
-          <WorkCard
-            href={`/portfolio/${item.slug}/`}
-            title={item.data.title}
-            category={item.data.category}
-            summary={item.data.summary}
-            cover={item.data.cover}
-          />
+
+      <nav class="landing-entries" aria-label="作品入口">
+        {entries.map((item) => (
+          <a class="landing-entry" href={item.href}>
+            <span class="entry-title"><span class="entry-dot" aria-hidden="true"></span>{item.label}</span>
+            <span class="entry-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="12" x2="20" y2="12"></line>
+                <polyline points="14,6 20,12 14,18"></polyline>
+              </svg>
+            </span>
+          </a>
         ))}
-      </div>
-    </section>
-
-    <section class="section alt" aria-labelledby="poster-title">
-      <div class="section-head">
-        <p class="eyebrow">Campus Visual Communication</p>
-        <h2 id="poster-title">平面设计</h2>
-        <p>学校新闻网站助管期间参与设计的海报，按节庆、校庆、专题宣传和新闻栏目组织展示。</p>
-      </div>
-      <PosterCarousel items={posterItems} client:visible />
-    </section>
-
-    <section class="photo-section" aria-labelledby="photo-title">
-      <div class="photo-copy">
-        <p class="eyebrow">Immersive Photography</p>
-        <h2 id="photo-title">摄影照片</h2>
-        <p>照片以拍摄地命名，用横向沉浸式画廊让风景本身成为第一视觉。</p>
-      </div>
-      <div class="photo-immersive">
-        {photos.map((photo) => (
-          <article class="photo-card">
-            <img src={photo.src} alt={photo.place} loading="lazy" />
-            <div class="place-tag">
-              <span>拍摄地</span>
-              <strong>{photo.place}</strong>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-
-    <section class="section blue" aria-labelledby="honors-title">
-      <div class="section-head">
-        <p class="eyebrow">Awards & Recognition</p>
-        <h2 id="honors-title">荣誉奖项</h2>
-        <p>奖学金、设计竞赛和学习阶段成果，作为设计与工程学习路径的旁证。</p>
-      </div>
-      <div class="honor-list">
-        {honors.map((honor, index) => (
-          <article class="honor-card">
-            <div class="honor-index">{String(index + 1).padStart(2, "0")}</div>
-            <div class="honor-copy">
-              <span>{honor.year}</span>
-              <h3>{honor.title}</h3>
-              <p>{honor.category}</p>
-            </div>
-            <img src={honor.src} alt={honor.title} loading="lazy" />
-          </article>
-        ))}
-      </div>
-    </section>
+      </nav>
+    </div>
   </main>
 </BaseLayout>
+
+<style>
+  .landing {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 100vh;
+    min-height: 100dvh;
+    color: var(--white);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .landing-media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background: #0c1012;
+  }
+
+  .landing-media::before {
+    position: absolute;
+    inset: -8%;
+    content: "";
+    background-image: url("/assets/hero/home-hero.jpg");
+    background-position: center center;
+    background-size: cover;
+    filter: blur(18px);
+    opacity: 0.65;
+    transform: scale(1.04);
+  }
+
+  .landing-media::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    background-image: url("/assets/hero/home-hero.jpg");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+  }
+
+  .landing-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse at 20% 80%, rgba(189, 140, 58, 0.12) 0%, transparent 45%),
+      linear-gradient(180deg, rgba(12, 16, 18, 0.42) 0%, rgba(12, 16, 18, 0.74) 58%, rgba(12, 16, 18, 0.92) 100%);
+  }
+
+  .landing-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 110px 20px 48px;
+  }
+
+  .landing-head {
+    width: 100%;
+    margin-bottom: 40px;
+  }
+
+  .landing-eyebrow {
+    position: relative;
+    display: inline-block;
+    margin: 0 0 12px;
+    padding-left: 16px;
+    color: var(--gold);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .landing-eyebrow::before {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 5px;
+    height: 5px;
+    content: "";
+    background: var(--gold);
+    border-radius: 50%;
+  }
+
+.landing-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22em;
+  margin: 0;
+  font-weight: 500;
+  font-style: italic;
+  line-height: 1.22;
+  letter-spacing: 0.02em;
+  /* 不 hover 时稍微透明 */
+  opacity: 0.7;
+  transition: opacity 300ms ease, color 300ms ease;
+}
+
+.landing-title:hover {
+  opacity: 1;
+  color: rgba(255, 253, 250, 1);
+  text-shadow: none;
+}
+
+  .title-line {
+    display: block;
+    white-space: nowrap;
+  }
+
+  .title-line-left {
+    text-align: left;
+  }
+
+  .title-line-right {
+    text-align: right;
+  }
+
+  .landing-entries {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    width: 100%;
+  }
+
+  .landing-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 0;
+    color: rgba(255, 253, 250, 0.55);
+    border-top: 1px solid rgba(255, 253, 250, 0.85);
+    transition: color 260ms ease, border-color 260ms ease;
+  }
+
+  .landing-entry:hover,
+  .landing-entry:focus-visible,
+  .landing-entry:hover:not(:first-child),
+  .landing-entry:focus-visible:not(:first-child) {
+    color: rgba(255, 253, 250, 0.95);
+    border-top-color: var(--gold);
+    outline: 0;
+  }
+
+  .landing-entry:not(:first-child) {
+    border-top-color: rgba(255, 253, 250, 0.18);
+  }
+
+  .entry-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+
+  .entry-dot {
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+    vertical-align: middle;
+    transition: color 260ms ease;
+  }
+
+  .entry-arrow {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    flex-shrink: 0;
+    transition: color 260ms ease;
+  }
+
+  .entry-arrow svg {
+    width: 20px;
+    height: 20px;
+    transform: rotate(-45deg);
+    transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1), color 260ms ease;
+  }
+
+  .landing-entry:hover .entry-arrow svg,
+  .landing-entry:focus-visible .entry-arrow svg {
+    transform: rotate(0deg);
+  }
+
+  @media (min-width: 561px) {
+    .landing-content {
+      padding: 120px 48px 80px;
+    }
+
+    .landing-head {
+      margin-bottom: 56px;
+    }
+
+    .landing-title {
+      font-size: 52px;
+      line-height: 1.18;
+    }
+
+    .landing-entries {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .landing-entry {
+      padding: 20px 0;
+    }
+
+    .landing-entry:not(:first-child) {
+      border-top-color: rgba(255, 253, 250, 0.85);
+    }
+
+    .entry-title {
+      font-size: 22px;
+    }
+  }
+
+  @media (min-width: 981px) {
+    .landing-content {
+      padding: 120px 56px 100px;
+    }
+
+    .landing-head {
+      margin-bottom: 64px;
+    }
+
+    .landing-title {
+      font-size: 60px;
+    }
+
+    .landing-entries {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    .entry-title {
+      font-size: 22px;
+    }
+  }
+
+  /* Desktop fixed-ratio stage + percentage positioning */
+  @media (min-width: 1200px) {
+    .landing {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      min-height: 100vh;
+    }
+
+    .landing-content {
+      position: absolute;
+      left: 50%;
+      bottom: 10%;
+      transform: translateX(-50%);
+      width: 55vw;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .landing-head {
+      margin-bottom: 4vmin;
+    }
+
+    .landing-eyebrow {
+      margin-bottom: 1.5vmin;
+      padding-left: 1.4vmin;
+      font-size: 1.1vmin;
+    }
+
+    .landing-eyebrow::before {
+      width: 0.45vmin;
+      height: 0.45vmin;
+    }
+
+    .landing-title {
+      font-size: 5vmin;
+      line-height: 1.22;
+    }
+
+    .landing-entries {
+      gap: 2.2vmin;
+    }
+
+    .landing-entry {
+      padding-top: 2vmin;
+      padding-bottom: 0;
+    }
+
+    .entry-title {
+      font-size: 1.8vmin;
+    }
+
+    .entry-arrow {
+      width: 3vmin;
+      height: 3vmin;
+    }
+
+    .entry-arrow svg {
+      width: 1.6vmin;
+      height: 1.6vmin;
+    }
+  }
+</style>
