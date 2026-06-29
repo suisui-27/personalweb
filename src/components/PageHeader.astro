@@ -1,0 +1,21 @@
+---
+/**
+ * 统一二级页面页头组件
+ *
+ * 所有模块（产品/平面/摄影/荣誉/关于）的列表页共用此组件，
+ * 确保 eyebrow → h1 → description 结构一致。
+ */
+interface Props {
+  eyebrow: string;
+  title: string;
+  description?: string;
+}
+
+const { eyebrow, title, description } = Astro.props;
+---
+
+<div class="section-head page-head">
+  <p class="eyebrow">{eyebrow}</p>
+  <h1>{title}</h1>
+  {description && <p>{description}</p>}
+</div>

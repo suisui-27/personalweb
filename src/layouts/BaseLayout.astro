@@ -12,11 +12,13 @@ const {
 } = Astro.props;
 
 const navItems = [
-  ["/portfolio/", "产品"],
-  ["/posters/", "平面"],
-  ["/photography/", "摄影"],
-  ["/honors/", "荣誉"]
+  ["/portfolio/", "工业产品"],
+  ["/posters/", "平面设计"],
+  ["/photography/", "摄影作品"],
+  ["/honors/", "个人成长"],
 ];
+
+const isHome = Astro.url.pathname === "/";
 ---
 
 <!doctype html>
@@ -29,22 +31,26 @@ const navItems = [
   </head>
   <body>
     <div class="site-shell">
-      <header class="site-header">
-        <a class="brand" href="/" aria-label="回到首页">
-          <span class="brand-mark">ID</span>
-          <span>Design x Engineering</span>
-        </a>
-        <nav class="site-nav" aria-label="主导航">
-          {navItems.map(([href, label]) => (
-            <a href={href} aria-current={Astro.url.pathname === href ? "page" : undefined}>{label}</a>
-          ))}
-        </nav>
-      </header>
+      {!isHome && (
+        <header class="site-header">
+          <a class="brand" href="/" aria-label="回到首页">
+            <span class="brand-mark">ID</span>
+            <span>← Design x Engineering</span>
+          </a>
+          <nav class="site-nav" aria-label="主导航">
+            {navItems.map(([href, label]) => (
+              <a href={href} aria-current={Astro.url.pathname === href ? "page" : undefined}>{label}</a>
+            ))}
+          </nav>
+        </header>
+      )}
       <slot />
-      <footer class="site-footer">
-        <span>Personal Portfolio</span>
-        <span>Designed for clarity, atmosphere, and future updates.</span>
-      </footer>
+      {!isHome && (
+        <footer class="site-footer">
+          <span>Personal Portfolio</span>
+          <span>Designed for clarity, atmosphere, and future updates.</span>
+        </footer>
+      )}
     </div>
   </body>
 </html>
