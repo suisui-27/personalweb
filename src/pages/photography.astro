@@ -21,17 +21,9 @@ const firstPhoto = photographyItems[0];
     </section>
 
     <section class="photo-list-panel" data-photo-list hidden>
-      <div class="photo-list-head">
-        <div>
-          <p class="eyebrow">Photography List</p>
-          <h2>摄影作品</h2>
-        </div>
-        <button class="photo-mode-button dark" type="button" data-photo-close-list>返回沉浸式</button>
-      </div>
-
       <div class="photo-list-grid">
         {photographyItems.map((photo, index) => (
-          <button class="photo-list-item" type="button" data-photo-index={index}>
+          <button class="photo-list-item" type="button" data-photo-index={index} style={`--name-chars: ${Math.max(photo.name.length, 1)}`}>
             <img src={photo.src} alt={photo.name} loading="lazy" />
             <span>{String(index + 1).padStart(2, "0")}</span>
             <strong>{photo.name}</strong>
@@ -52,13 +44,30 @@ const firstPhoto = photographyItems[0];
   const title = document.querySelector("[data-photo-title]");
   const listPanel = document.querySelector("[data-photo-list]");
   const listButton = document.querySelector("[data-photo-list-button]");
-  const closeListButton = document.querySelector("[data-photo-close-list]");
   const nextButton = document.querySelector("[data-photo-random-next]");
   const listItems = document.querySelectorAll("[data-photo-index]");
   let currentIndex = 0;
   let activeLayer = 0;
   let timer = 0;
   let isSwitching = false;
+  let remainingIndices = [];
+
+  const shuffle = (items) => {
+    const nextItems = [...items];
+    for (let i = nextItems.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [nextItems[i], nextItems[j]] = [nextItems[j], nextItems[i]];
+    }
+    return nextItems;
+  };
+
+  const refillRemaining = (excludeIndex = currentIndex) => {
+    remainingIndices = shuffle(photos.map((_, index) => index).filter((index) => index !== excludeIndex));
+  };
+
+  const markPhotoSeen = (index) => {
+    remainingIndices = remainingIndices.filter((item) => item !== index);
+  };
 
   photos.forEach((photo) => {
     const preload = new Image();
@@ -72,10 +81,10 @@ const firstPhoto = photographyItems[0];
 
   const getRandomIndex = () => {
     if (photos.length <= 1) return 0;
-    let nextIndex = currentIndex;
-    while (nextIndex === currentIndex) {
-      nextIndex = Math.floor(Math.random() * photos.length);
+    if (remainingIndices.length === 0) {
+      refillRemaining(currentIndex);
     }
+    const nextIndex = remainingIndices.pop();
     return nextIndex;
   };
 
@@ -101,6 +110,7 @@ const firstPhoto = photographyItems[0];
       nextImage.removeAttribute("aria-hidden");
       title.textContent = nextPhoto.name;
       currentIndex = normalizedIndex;
+      markPhotoSeen(normalizedIndex);
       stage?.classList.remove("is-loading");
       void nextImage.offsetWidth;
       currentImage.classList.add("is-leaving");
@@ -130,8 +140,10 @@ const firstPhoto = photographyItems[0];
 
   const openList = () => {
     window.clearInterval(timer);
-    if (!listPanel) return;
+    if (!listPanel || !title || !listButton) return;
     listPanel.hidden = false;
+    title.textContent = "Photography List";
+    listButton.textContent = "Back";
     document.body.classList.add("photo-list-open");
     listPanel.classList.add("is-opening");
     window.setTimeout(() => listPanel.classList.remove("is-opening"), 360);
@@ -139,15 +151,22 @@ const firstPhoto = photographyItems[0];
 
   const closeList = (index = currentIndex) => {
     document.body.classList.remove("photo-list-open");
-    if (!listPanel) return;
+    if (!listPanel || !title || !listButton) return;
     listPanel.hidden = true;
+    title.textContent = photos[index]?.name || photos[currentIndex]?.name || "";
+    listButton.textContent = "List";
     showPhoto(index);
     schedule();
   };
 
   nextButton?.addEventListener("click", () => showPhoto(getRandomIndex()));
-  listButton?.addEventListener("click", openList);
-  closeListButton?.addEventListener("click", () => closeList());
+  listButton?.addEventListener("click", () => {
+    if (document.body.classList.contains("photo-list-open")) {
+      closeList();
+      return;
+    }
+    openList();
+  });
   listItems.forEach((item) => {
     item.addEventListener("click", () => {
       const index = Number(item.getAttribute("data-photo-index") || 0);
@@ -155,5 +174,6 @@ const firstPhoto = photographyItems[0];
     });
   });
 
+  refillRemaining(currentIndex);
   schedule();
 </script>

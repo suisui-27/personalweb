@@ -15,7 +15,8 @@ const { Content } = await render(entry);
 ---
 
 <BaseLayout title={`${entry.data.title} | 作品`} description={entry.data.summary}>
-  <main>
+  <main class="visual-page project-detail-page">
+    <a class="project-back-link" href="/portfolio/" aria-label="返回工业产品">返回工业产品</a>
     <section class="article-hero">
       <div>
         <p class="eyebrow">{entry.data.category} / {entry.data.year}</p>
