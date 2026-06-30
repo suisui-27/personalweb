@@ -1,231 +1,167 @@
 # Data Model / 数据模型文档
 
-> **AI 阅读指南**：本文档描述全站所有数据模块的结构、字段定义和文件位置。
-> 修改内容时，只需编辑对应的数据文件或 MDX frontmatter，无需改动页面模板。
+本文档描述站点内容入口、字段结构和页面消费关系。修改内容时优先编辑对应的数据文件或 MDX frontmatter。
 
----
+## 总览
 
-## 架构总览
+| 模块 | 数据入口 | 类型定义 | 页面 |
+| --- | --- | --- | --- |
+| 工业产品 | `src/content/portfolio/*.mdx` | `src/content/config.ts` + `src/data/types.ts` | `/portfolio/`、`/portfolio/[slug]/` |
+| 平面设计 | `src/data/posters.ts` | `PosterItem` | `/posters/` |
+| 摄影作品 | `src/data/photography.ts` | `PhotographyItem` | `/photography/` |
+| 个人成长/荣誉 | `src/data/honors.ts` | `HonorItem` | `/honors/` |
+| 自我介绍 | `src/data/profile.ts` | `Profile` | `/honors/` |
 
-```
-数据源                    类型定义                 页面消费
-─────────               ─────────               ─────────
-src/content/portfolio/  → content/config.ts    → index.astro, portfolio/index.astro, portfolio/[slug].astro
-src/data/posters.ts     → src/data/types.ts     → index.astro, posters.astro (via PosterCarousel.tsx)
-src/data/photography.ts → src/data/types.ts     → index.astro, photography.astro
-src/data/honors.ts      → src/data/types.ts     → index.astro, honors.astro
-src/data/profile.ts     → src/data/types.ts     → about.astro
-```
+全站类型集中在 `src/data/types.ts`。四个二级页面共享暗色、金色强调和 GSAP 页面过渡，但不使用统一背景底图，内容本身是视觉主体。
 
-**四大模块 + 关于页**，共 5 个数据入口。所有 TypeScript 接口集中在 `src/data/types.ts`。
+## 1. Portfolio / 工业产品
 
----
-
-## 1. 产品 / Portfolio
-
-| 属性 | 文件 / 位置 |
-|------|------------|
-| 数据源 | `src/content/portfolio/*.mdx`（每篇 MDX = 一条作品） |
-| Schema 定义 | `src/content/config.ts` |
-| 类型接口 | `PortfolioItem`（`src/data/types.ts`） |
+| 属性 | 说明 |
+| --- | --- |
+| 数据源 | `src/content/portfolio/*.mdx` |
+| Schema | `src/content/config.ts` |
 | 列表页 | `src/pages/portfolio/index.astro` |
 | 详情页 | `src/pages/portfolio/[slug].astro` |
-| 首页展示 | `src/pages/index.astro`（取前 6 条，featured 优先） |
 | 卡片组件 | `src/components/WorkCard.astro` |
 | 图片目录 | `public/assets/portfolio/{slug}/` |
 
-### Frontmatter 字段
+### Frontmatter
 
 | 字段 | 类型 | 必填 | 默认值 | 说明 |
-|------|------|------|--------|------|
-| `title` | `string` | 是 | — | 作品标题 |
-| `category` | `PortfolioCategory` | 是 | — | 分类：`"3D 模型"` / `"产品设计"` / `"产品概念"` / `"界面设计"` |
-| `cover` | `string` | 是 | — | 封面图路径，如 `"/assets/portfolio/bike-shuttle-robot/cover.jpg"` |
-| `summary` | `string` | 是 | — | 一句话摘要，显示在卡片和详情页 |
-| `year` | `string` | 是 | — | 年份，如 `"2024"` |
-| `featured` | `boolean` | 否 | `false` | 首页是否优先展示 |
-| `tags` | `string[]` | 否 | `[]` | 标签列表，详情页显示为胶囊 |
-| `gallery` | `{ src, caption }[]` | 否 | `[]` | 详情页底部图廊 |
+| --- | --- | --- | --- | --- |
+| `title` | `string` | 是 | - | 产品标题 |
+| `category` | `PortfolioCategory` | 是 | - | `"3D 模型"` / `"产品设计"` / `"产品概念"` / `"界面设计"` |
+| `cover` | `string` | 是 | - | 封面路径 |
+| `summary` | `string` | 是 | - | 摘要 |
+| `year` | `string` | 是 | - | 年份 |
+| `featured` | `boolean` | 否 | `false` | 是否作为精选内容 |
+| `tags` | `string[]` | 否 | `[]` | 标签 |
+| `gallery` | `{ src, caption }[]` | 否 | `[]` | 详情页图廊 |
 
-### MDX 正文
+工业产品列表页使用等宽等高卡片，封面图固定 `object-fit: contain`，保证预览图片完整显示。
 
-frontmatter 之后的 Markdown/MDX 内容会渲染到详情页 `.article-body` 区域。
+## 2. Posters / 平面设计
 
-### 示例
-
-```mdx
----
-title: "共享单车摆渡机器人"
-category: "3D 模型"
-cover: "/assets/portfolio/bike-shuttle-robot/cover.jpg"
-summary: "面向共享单车调度场景的摆渡机器人概念设计。"
-year: "2024"
-featured: true
-tags: ["3D 建模", "服务机器人", "机械结构"]
-gallery:
-  - src: "/assets/portfolio/bike-shuttle-robot/render.jpg"
-    caption: "渲染图：整体造型与使用场景"
----
-
-正文内容……
-```
-
----
-
-## 2. 平面 / Posters
-
-| 属性 | 文件 / 位置 |
-|------|------------|
+| 属性 | 说明 |
+| --- | --- |
 | 数据源 | `src/data/posters.ts` |
-| 类型接口 | `PosterItem`（`src/data/types.ts`） |
-| 列表页 | `src/pages/posters.astro` |
-| 首页展示 | `src/pages/index.astro`（全部条目） |
-| 轮播组件 | `src/components/PosterCarousel.tsx` |
+| 类型 | `PosterItem` |
+| 页面 | `src/pages/posters.astro` |
+| 组件 | `src/components/PosterCarousel.tsx` |
 | 图片目录 | `public/assets/posters/` |
 
-### 字段定义
+### 字段
 
 | 字段 | 类型 | 说明 |
-|------|------|------|
-| `src` | `string` | 图片路径，如 `"/assets/posters/2024-new-year.jpg"` |
+| --- | --- | --- |
+| `src` | `string` | 海报图片路径 |
 | `title` | `string` | 海报标题 |
-| `category` | `PosterCategory` | 分类：`"节庆视觉"` / `"专题宣传"` / `"校庆视觉"` / `"校园视觉"` / `"栏目视觉"` / `"校友故事"` / `"周年专题"` |
+| `category` | `PosterCategory` | 分类 |
 
-### 数据结构
+`PosterCarousel` 会预载图片。快速切换时，目标图片未完成加载前保留当前图并显示加载提示，避免出现状态切换但图片停留在旧图的问题。
 
-```typescript
-export const posterItems: PosterItem[] = [
-  { src: "/assets/posters/2024-new-year.jpg", title: "2024 元旦祝福", category: "节庆视觉" },
-  // ...
-];
-```
+## 3. Photography / 摄影作品
 
----
-
-## 3. 摄影 / Photography
-
-| 属性 | 文件 / 位置 |
-|------|------------|
+| 属性 | 说明 |
+| --- | --- |
 | 数据源 | `src/data/photography.ts` |
-| 类型接口 | `PhotographyItem`（`src/data/types.ts`） |
-| 列表页 | `src/pages/photography.astro` |
-| 首页展示 | `src/pages/index.astro`（全部条目） |
+| 类型 | `PhotographyItem` |
+| 页面 | `src/pages/photography.astro` |
 | 图片目录 | `public/assets/photography/` |
 
-### 字段定义
+### 字段
 
 | 字段 | 类型 | 说明 |
-|------|------|------|
-| `src` | `string` | 图片路径 |
-| `place` | `string` | 拍摄地点 |
-| `note` | `string` | 拍摄说明（光线、主题等） |
+| --- | --- | --- |
+| `src` | `string` | 照片路径 |
+| `name` | `string` | 展示名称，建议包含题目与地点 |
 
-### 数据结构
+摄影页是沉浸式单张展示：
 
-```typescript
-export const photographyItems: PhotographyItem[] = [
-  { src: "/assets/photography/lenggacuo-03.jpg", place: "冷嘎措", note: "雪山、湖泊与高海拔光线" },
-  // ...
-];
+- 每 5 秒随机切换一张。
+- 点击屏幕随机切换一张。
+- 点击 `List` 进入列表。
+- 点击列表元素后关闭列表并进入对应照片的沉浸式展示。
+
+## 4. Honors / 个人成长与荣誉
+
+| 属性 | 说明 |
+| --- | --- |
+| 荣誉数据 | `src/data/honors.ts` |
+| 自我介绍数据 | `src/data/profile.ts` |
+| 类型 | `HonorItem`、`Profile` |
+| 页面 | `src/pages/honors.astro` |
+| 文件目录 | `public/assets/honors/` |
+
+### HonorItem 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `src` | `string` | 图片或文档路径 |
+| `preview` | `string | undefined` | 可选预览图，常用于文档类荣誉 |
+| `title` | `string` | 荣誉标题 |
+| `category` | `HonorCategory` | 荣誉分类 |
+| `year` | `string` | 年份或学年 |
+| `kind` | `"image" | "document" | undefined` | 文件类型，默认可按图片处理 |
+
+图片荣誉示例：
+
+```ts
+{
+  src: "/assets/honors/2025-industrial-design-second.jpg",
+  title: "2025 年全国大学生工业设计大赛北京市二等奖",
+  category: "工业设计竞赛",
+  year: "2025",
+  kind: "image"
+}
 ```
 
----
+文档荣誉示例：
 
-## 4. 荣誉 / Honors
-
-| 属性 | 文件 / 位置 |
-|------|------------|
-| 数据源 | `src/data/honors.ts` |
-| 类型接口 | `HonorItem`（`src/data/types.ts`） |
-| 列表页 | `src/pages/honors.astro` |
-| 首页展示 | `src/pages/index.astro`（全部条目） |
-| 图片目录 | `public/assets/honors/` |
-
-### 字段定义
-
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `src` | `string` | 证书/文档图片路径 |
-| `title` | `string` | 奖项名称 |
-| `category` | `HonorCategory` | 分类：`"工业设计竞赛"` / `"设计竞赛"` / `"奖学金"` / `"文档材料"` |
-| `year` | `string` | 获奖年份或学年 |
-
-### 数据结构
-
-```typescript
-export const honorItems: HonorItem[] = [
-  { src: "/assets/honors/2025-industrial-design-second.jpg", title: "...", category: "工业设计竞赛", year: "2025" },
-  // ...
-];
+```ts
+{
+  src: "/assets/honors/25工业设计大赛获奖名单.docx",
+  title: "2025 工业设计大赛获奖名单",
+  category: "文档材料",
+  year: "2025",
+  kind: "document"
+}
 ```
 
----
-
-## 5. 关于 / Profile
-
-| 属性 | 文件 / 位置 |
-|------|------------|
-| 数据源 | `src/data/profile.ts` |
-| 类型接口 | `Profile`（`src/data/types.ts`） |
-| 展示页面 | `src/pages/about.astro` |
-
-### 字段定义
+### Profile 字段
 
 | 字段 | 类型 | 说明 |
-|------|------|------|
-| `name` | `string` | 姓名 |
+| --- | --- | --- |
+| `name` | `string` | 姓名或署名 |
 | `tagline` | `string` | 一句话定位 |
-| `bio` | `string[]` | 自我介绍段落（每段一个元素） |
-| `education` | `EducationRecord[]` | 教育经历列表 |
+| `bio` | `string[]` | 自我介绍段落 |
+| `education` | `EducationRecord[]` | 教育经历 |
 | `skills` | `SkillGroup[]` | 技能分组 |
 | `interests` | `string[]` | 兴趣方向 |
 
-### EducationRecord
+当前 `/honors/` 页面会使用 `profile.tagline`、`profile.bio` 和 `profile.education` 组成个人成长叙事。
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `period` | `string` | 时间段，如 `"2024 — 至今"` |
-| `school` | `string` | 学校 |
-| `major` | `string` | 专业 |
-| `degree` | `string` | 学位 |
+## 资源目录
 
-### SkillGroup
-
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `category` | `string` | 分组名称 |
-| `items` | `string[]` | 该组下的技能列表 |
-
----
-
-## 资源目录映射
-
-```
+```text
 public/assets/
-  hero/              → 首页 hero 背景图（CSS 引用）
-  readme/            → README 图片
-  portfolio/         → 产品作品图片
-    {slug}/          → 每个作品一个文件夹
-      cover.jpg      → 封面（frontmatter cover 字段）
-      render.jpg     → 渲染图（gallery 字段）
-      ...
-  posters/           → 平面海报图片
-  photography/       → 摄影照片
-  honors/            → 荣誉证书图片
+  hero/
+  portfolio/{slug}/
+  posters/
+  photography/
+  honors/
+  readme/
 ```
-
----
 
 ## 修改指南
 
-| 想做什么 | 编辑哪个文件 |
-|---------|-------------|
-| 新增/修改作品 | `src/content/portfolio/` 下新增 .mdx 文件 |
-| 新增/修改海报 | `src/data/posters.ts` |
-| 新增/修改摄影 | `src/data/photography.ts` |
-| 新增/修改荣誉 | `src/data/honors.ts` |
-| 修改个人介绍 | `src/data/profile.ts` |
+| 目标 | 修改文件 |
+| --- | --- |
+| 新增/修改工业产品 | `src/content/portfolio/*.mdx` |
+| 新增/修改平面海报 | `src/data/posters.ts` |
+| 新增/修改摄影作品 | `src/data/photography.ts` |
+| 新增/修改荣誉文件 | `src/data/honors.ts` |
+| 修改自我介绍 | `src/data/profile.ts` |
 | 修改字段定义 | `src/data/types.ts` |
-| 修改作品 Schema | `src/content/config.ts` |
-| 修改全局样式 | `src/styles/global.css` |
-| 修改导航/布局 | `src/layouts/BaseLayout.astro` |
+| 修改页面风格 | `src/styles/global.css` |
+| 修改页面过渡 | `src/layouts/BaseLayout.astro` |

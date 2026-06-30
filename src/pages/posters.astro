@@ -1,19 +1,19 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import PageHeader from "../components/PageHeader.astro";
 import PosterCarousel from "../components/PosterCarousel";
 import { posterItems } from "../data/posters";
 ---
 
 <BaseLayout title="平面设计 | 个人作品集">
-  <main>
-    <section class="section">
-      <PageHeader
-        eyebrow="Campus Visual Communication"
-        title="平面设计"
-        description="学校新闻网站助管期间参与设计的海报，按节庆、校庆、专题宣传和新闻栏目组织展示。"
-      />
-      <PosterCarousel items={posterItems} client:visible />
+  <main class="visual-page posters-page">
+    <section class="module-note">
+      <p>学校新闻网站助管期间参与设计的海报，按节庆、校庆、专题宣传和新闻栏目组织展示。</p>
+    </section>
+
+    <section class="section dark-section">
+      <div class="poster-stage reveal-item">
+        <PosterCarousel items={posterItems} client:load />
+      </div>
     </section>
   </main>
 </BaseLayout>

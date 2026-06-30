@@ -1,27 +1,159 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { photographyItems } from "../data/photography";
+
+const photosJson = JSON.stringify(photographyItems);
+const firstPhoto = photographyItems[0];
 ---
 
 <BaseLayout title="摄影作品 | 个人作品集">
-  <main>
-    <section class="photo-section">
-      <div class="photo-copy section-head page-head">
-        <p class="eyebrow">Immersive Photography</p>
-        <h1>摄影作品</h1>
-        <p>旅途、风景和空间记录。照片以拍摄地命名，用横向沉浸式画廊让风景本身成为第一视觉。</p>
+  <main class="photo-experience" data-photo-page>
+    <div class="photo-control-row">
+      <h1 class="photo-current-name" data-photo-title>{firstPhoto.name}</h1>
+      <button class="photo-mode-button" type="button" data-photo-list-button>List</button>
+    </div>
+
+    <section class="photo-immersive-panel" data-photo-stage aria-live="polite">
+      <img class="photo-bg is-active" src={firstPhoto.src} alt={firstPhoto.name} data-photo-layer="0" />
+      <img class="photo-bg" src="" alt="" aria-hidden="true" data-photo-layer="1" />
+
+      <button class="photo-hit-area" type="button" data-photo-random-next aria-label="切换下一张摄影作品"></button>
+    </section>
+
+    <section class="photo-list-panel" data-photo-list hidden>
+      <div class="photo-list-head">
+        <div>
+          <p class="eyebrow">Photography List</p>
+          <h2>摄影作品</h2>
+        </div>
+        <button class="photo-mode-button dark" type="button" data-photo-close-list>返回沉浸式</button>
       </div>
-      <div class="photo-immersive">
-        {photographyItems.map((photo) => (
-          <article class="photo-card">
-            <img src={photo.src} alt={photo.place} loading="lazy" />
-            <div class="place-tag">
-              <span>{photo.note}</span>
-              <strong>{photo.place}</strong>
-            </div>
-          </article>
+
+      <div class="photo-list-grid">
+        {photographyItems.map((photo, index) => (
+          <button class="photo-list-item" type="button" data-photo-index={index}>
+            <img src={photo.src} alt={photo.name} loading="lazy" />
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <strong>{photo.name}</strong>
+          </button>
         ))}
       </div>
     </section>
   </main>
+  <script id="photo-data" type="application/json" set:html={photosJson} is:inline></script>
 </BaseLayout>
+
+<script is:inline>
+  const dataNode = document.getElementById("photo-data");
+  const photos = JSON.parse(dataNode?.textContent || "[]");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const stage = document.querySelector("[data-photo-stage]");
+  const imageLayers = Array.from(document.querySelectorAll("[data-photo-layer]"));
+  const title = document.querySelector("[data-photo-title]");
+  const listPanel = document.querySelector("[data-photo-list]");
+  const listButton = document.querySelector("[data-photo-list-button]");
+  const closeListButton = document.querySelector("[data-photo-close-list]");
+  const nextButton = document.querySelector("[data-photo-random-next]");
+  const listItems = document.querySelectorAll("[data-photo-index]");
+  let currentIndex = 0;
+  let activeLayer = 0;
+  let timer = 0;
+  let isSwitching = false;
+
+  photos.forEach((photo) => {
+    const preload = new Image();
+    preload.src = photo.src;
+  });
+
+  const schedule = () => {
+    window.clearInterval(timer);
+    timer = window.setInterval(() => showPhoto(getRandomIndex()), 5000);
+  };
+
+  const getRandomIndex = () => {
+    if (photos.length <= 1) return 0;
+    let nextIndex = currentIndex;
+    while (nextIndex === currentIndex) {
+      nextIndex = Math.floor(Math.random() * photos.length);
+    }
+    return nextIndex;
+  };
+
+  const showPhoto = (nextIndex) => {
+    if (isSwitching || imageLayers.length < 2 || !title || photos.length === 0) return;
+    const normalizedIndex = (nextIndex + photos.length) % photos.length;
+    if (normalizedIndex === currentIndex) return;
+    const nextPhoto = photos[normalizedIndex];
+    const currentImage = imageLayers[activeLayer];
+    const nextLayer = activeLayer === 0 ? 1 : 0;
+    const nextImage = imageLayers[nextLayer];
+    const loader = new Image();
+
+    isSwitching = true;
+    stage?.classList.add("is-loading");
+    stage?.setAttribute("data-transitioning", "true");
+
+    loader.onload = () => {
+      nextImage.classList.remove("is-active", "is-entering", "is-leaving");
+      currentImage.classList.remove("is-entering", "is-leaving");
+      nextImage.src = nextPhoto.src;
+      nextImage.alt = nextPhoto.name;
+      nextImage.removeAttribute("aria-hidden");
+      title.textContent = nextPhoto.name;
+      currentIndex = normalizedIndex;
+      stage?.classList.remove("is-loading");
+      void nextImage.offsetWidth;
+      currentImage.classList.add("is-leaving");
+      nextImage.classList.add("is-entering");
+
+      window.setTimeout(() => {
+        currentImage.className = "photo-bg";
+        currentImage.alt = "";
+        currentImage.setAttribute("aria-hidden", "true");
+        nextImage.className = "photo-bg is-active";
+        nextImage.removeAttribute("aria-hidden");
+        activeLayer = nextLayer;
+        stage?.removeAttribute("data-transitioning");
+        isSwitching = false;
+        schedule();
+      }, reduceMotion ? 400 : 520);
+    };
+
+    loader.onerror = () => {
+      stage?.classList.remove("is-loading");
+      stage?.removeAttribute("data-transitioning");
+      isSwitching = false;
+    };
+
+    loader.src = nextPhoto.src;
+  };
+
+  const openList = () => {
+    window.clearInterval(timer);
+    if (!listPanel) return;
+    listPanel.hidden = false;
+    document.body.classList.add("photo-list-open");
+    listPanel.classList.add("is-opening");
+    window.setTimeout(() => listPanel.classList.remove("is-opening"), 360);
+  };
+
+  const closeList = (index = currentIndex) => {
+    document.body.classList.remove("photo-list-open");
+    if (!listPanel) return;
+    listPanel.hidden = true;
+    showPhoto(index);
+    schedule();
+  };
+
+  nextButton?.addEventListener("click", () => showPhoto(getRandomIndex()));
+  listButton?.addEventListener("click", openList);
+  closeListButton?.addEventListener("click", () => closeList());
+  listItems.forEach((item) => {
+    item.addEventListener("click", () => {
+      const index = Number(item.getAttribute("data-photo-index") || 0);
+      closeList(index);
+    });
+  });
+
+  schedule();
+</script>

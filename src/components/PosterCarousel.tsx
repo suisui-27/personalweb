@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 interface PosterItem {
   src: string;
@@ -11,20 +11,86 @@ interface Props {
 }
 
 export default function PosterCarousel({ items }: Props) {
+  const loadedRef = useRef(new Set<string>());
+  const latestTargetRef = useRef(0);
+  const transitionTimerRef = useRef<number | null>(null);
   const [index, setIndex] = useState(0);
-  const current = items[index];
+  const [displayIndex, setDisplayIndex] = useState(0);
+  const [previousIndex, setPreviousIndex] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const current = items[displayIndex];
+  const target = items[index];
+
+  const showLoadedImage = useCallback((nextIndex: number) => {
+    if (nextIndex === displayIndex) return;
+    setPreviousIndex(displayIndex);
+    setDisplayIndex(nextIndex);
+    if (transitionTimerRef.current) {
+      window.clearTimeout(transitionTimerRef.current);
+    }
+    transitionTimerRef.current = window.setTimeout(() => {
+      setPreviousIndex(null);
+      transitionTimerRef.current = null;
+    }, 520);
+  }, [displayIndex]);
+
+  const loadImage = useCallback((nextIndex: number) => {
+    const item = items[nextIndex];
+    if (!item) return;
+
+    latestTargetRef.current = nextIndex;
+    setIndex(nextIndex);
+
+    if (loadedRef.current.has(item.src)) {
+      showLoadedImage(nextIndex);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    const image = new Image();
+    image.onload = () => {
+      loadedRef.current.add(item.src);
+      if (latestTargetRef.current === nextIndex) {
+        showLoadedImage(nextIndex);
+        setIsLoading(false);
+      }
+    };
+    image.onerror = () => {
+      if (latestTargetRef.current === nextIndex) {
+        setIsLoading(false);
+      }
+    };
+    image.src = item.src;
+  }, [items, showLoadedImage]);
+
+  useEffect(() => {
+    items.forEach((item) => {
+      const image = new Image();
+      image.onload = () => loadedRef.current.add(item.src);
+      image.src = item.src;
+    });
+    loadedRef.current.add(items[0]?.src || "");
+  }, [items]);
+
+  useEffect(() => () => {
+    if (transitionTimerRef.current) {
+      window.clearTimeout(transitionTimerRef.current);
+    }
+  }, []);
 
   const go = useCallback(
     (dir: number) => {
-      setIndex((prev) => (prev + dir + items.length) % items.length);
+      const baseIndex = latestTargetRef.current;
+      loadImage((baseIndex + dir + items.length) % items.length);
     },
-    [items.length]
+    [items.length, loadImage]
   );
 
-  const goTo = useCallback((i: number) => setIndex(i), []);
+  const goTo = useCallback((i: number) => loadImage(i), [loadImage]);
 
   return (
-    <div className="poster-carousel" role="region" aria-label="平面设计轮播">
+    <div className="poster-carousel" role="region" aria-label="平面设计轮播" aria-busy={isLoading}>
       <div className="poster-viewport">
         <button
           type="button"
@@ -39,7 +105,16 @@ export default function PosterCarousel({ items }: Props) {
 
         <figure className="poster-slide">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={current.src} alt={current.title} loading="lazy" />
+          <img key={current.src} className="poster-image is-current" src={current.src} alt={current.title} loading="eager" />
+          {previousIndex !== null && items[previousIndex] && (
+            <img className="poster-image is-previous" src={items[previousIndex].src} alt="" aria-hidden="true" />
+          )}
+          {isLoading && (
+            <figcaption className="poster-loading">
+              <span>正在载入</span>
+              <strong>{target.title}</strong>
+            </figcaption>
+          )}
         </figure>
 
         <button

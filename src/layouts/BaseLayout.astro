@@ -34,8 +34,7 @@ const isHome = Astro.url.pathname === "/";
       {!isHome && (
         <header class="site-header">
           <a class="brand" href="/" aria-label="回到首页">
-            <span class="brand-mark">ID</span>
-            <span>← Design x Engineering</span>
+            <span>主页</span>
           </a>
           <nav class="site-nav" aria-label="主导航">
             {navItems.map(([href, label]) => (
@@ -45,12 +44,57 @@ const isHome = Astro.url.pathname === "/";
         </header>
       )}
       <slot />
-      {!isHome && (
-        <footer class="site-footer">
-          <span>Personal Portfolio</span>
-          <span>Designed for clarity, atmosphere, and future updates.</span>
-        </footer>
-      )}
+      <div class="page-transition" aria-hidden="true"><span></span></div>
     </div>
+    <script>
+      import { gsap } from "gsap";
+      import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const transition = document.querySelector(".page-transition");
+
+      if (transition && !reduceMotion) {
+        gsap.set(transition, { autoAlpha: 1 });
+        gsap
+          .timeline({ defaults: { ease: "power3.out" } })
+          .to(transition, { autoAlpha: 0, duration: 0.72 })
+          .from(".site-header", { y: -18, autoAlpha: 0, duration: 0.48 }, 0.08)
+          .from("main > section, main > .photo-immersive-panel", { y: 18, autoAlpha: 0, duration: 0.62, stagger: 0.06 }, 0.12);
+
+        ScrollTrigger.batch(".reveal-item, .work-card, .honor-tile, .photo-list-item", {
+          start: "top 88%",
+          once: true,
+          onEnter: (elements) => {
+            gsap.fromTo(elements, { y: 24, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.62, stagger: 0.06, ease: "power2.out" });
+          },
+        });
+
+        window.addEventListener("pageshow", () => {
+          gsap.to(transition, { autoAlpha: 0, duration: 0.28, overwrite: true });
+        });
+
+        document.addEventListener("click", (event) => {
+          const target = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a") : null;
+          if (!target) return;
+          const href = target.getAttribute("href");
+          if (!href || href.startsWith("#") || target.target || target.hasAttribute("download")) return;
+
+          const url = new URL(href, window.location.href);
+          if (url.origin !== window.location.origin || url.pathname === window.location.pathname) return;
+
+          event.preventDefault();
+          gsap.to(transition, {
+            autoAlpha: 1,
+            duration: 0.34,
+            ease: "power2.inOut",
+            onComplete: () => {
+              window.location.href = url.href;
+            },
+          });
+        });
+      }
+    </script>
   </body>
 </html>
