@@ -1,28 +1,48 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import PageHeader from "../components/PageHeader.astro";
 import { honorItems } from "../data/honors";
+import { profile } from "../data/profile";
 ---
 
 <BaseLayout title="个人成长 | 个人作品集">
-  <main>
-    <section class="section">
-      <PageHeader
-        eyebrow="Awards & Recognition"
-        title="个人成长"
-        description="竞赛奖项与奖学金记录，作为设计与工程学习路径的旁证。"
-      />
-      <div class="honor-list">
-        {honorItems.map((honor, index) => (
-          <article class="honor-card">
-            <div class="honor-index">{String(index + 1).padStart(2, "0")}</div>
-            <div class="honor-copy">
-              <span>{honor.year}</span>
-              <h3>{honor.title}</h3>
-              <p>{honor.category}</p>
+  <main class="visual-page growth-page">
+    <section class="module-note growth-note">
+      <p>{profile.tagline}</p>
+    </section>
+
+    <section class="section dark-section growth-section">
+      <div class="growth-overview">
+        <div class="growth-intro reveal-item">
+          {profile.bio.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+
+        <div class="growth-education reveal-item">
+          {profile.education.map((item) => (
+            <article>
+              <span>{item.period}</span>
+              <strong>{item.school}</strong>
+              <p>{item.major} / {item.degree}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div class="honor-board">
+        {honorItems.map((honor) => (
+          <a class={`honor-row ${honor.kind === "document" ? "is-document" : ""}`} href={honor.src} target="_blank" rel="noreferrer">
+            <div class="honor-year">{honor.year}</div>
+            <div class="honor-row-copy">
+              <span>{honor.category}</span>
+              <h2>{honor.title}</h2>
             </div>
-            <img src={honor.src} alt={honor.title} loading="lazy" />
-          </article>
+            <div class="honor-proof" aria-hidden="true">
+              {honor.kind === "document" ? (
+                <span>DOCX</span>
+              ) : (
+                <img src={honor.preview || honor.src} alt="" loading="lazy" />
+              )}
+            </div>
+          </a>
         ))}
       </div>
     </section>

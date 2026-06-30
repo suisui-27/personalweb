@@ -2,7 +2,6 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import WorkCard from "../../components/WorkCard.astro";
-import PageHeader from "../../components/PageHeader.astro";
 
 const portfolio = (await getCollection("portfolio")).sort((a, b) =>
   b.data.year.localeCompare(a.data.year)
@@ -10,14 +9,13 @@ const portfolio = (await getCollection("portfolio")).sort((a, b) =>
 ---
 
 <BaseLayout title="工业产品 | 个人作品集">
-  <main>
-    <section class="section">
-      <PageHeader
-        eyebrow="Product & System"
-        title="工业产品"
-        description="工业设计、界面、产品概念和 3D 模型项目。每个项目包含封面、摘要、标签和详情图廊。"
-      />
-      <div class="card-grid">
+  <main class="visual-page portfolio-page">
+    <section class="module-note">
+      <p>把产品概念、结构推演和建模渲染统一放进同一套尺度里浏览。封面保持完整显示，方便比较不同项目的比例、轮廓和细节。</p>
+    </section>
+
+    <section class="section dark-section">
+      <div class="card-grid portfolio-grid">
         {portfolio.map((item) => (
           <WorkCard
             href={`/portfolio/${item.slug}/`}

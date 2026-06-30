@@ -1,154 +1,126 @@
-# Personal Web / 个人展示网站
+# Personal Web / 个人作品集
 
 <img src="public/assets/readme/cover.jpg" alt="README cover" width="284">
 
-> 我们会做的越来越好的
-
----
+> 我们会做得越来越好的
 
 ## 技术栈
 
 | 技术 | 用途 |
-|------|------|
-| **Astro 5** | 静态站点框架，路由 + 内容集合 |
-| **React 19** | 交互组件（轮播、Three.js 渲染） |
-| **MDX** | 作品正文编写 |
-| **Three.js** | 首页轻量 3D 点缀（金色 TorusKnot） |
-| **TypeScript** | 全站类型安全，数据模型集中在 `src/data/types.ts` |
-| **pnpm** | 包管理器（唯一，不要混用 npm/yarn） |
-| **Netlify** | 部署平台，读取 `netlify.toml` |
+| --- | --- |
+| Astro 5 | 静态站点框架，负责路由、页面和内容集合 |
+| React 19 | 海报轮播等交互组件 |
+| MDX | 工业产品详情正文 |
+| GSAP + ScrollTrigger | 页面进出场、卡片入场和沉浸式图片切换动画 |
+| Three.js | 首页轻量 3D 点缀 |
+| TypeScript | 数据模型与交互脚本类型约束 |
+| pnpm | 包管理器，安装依赖时优先使用 pnpm |
 
 ## 快速开始
 
 ```bash
-pnpm install      # 安装依赖
-pnpm dev          # 本地开发 → http://127.0.0.1:4321/
-pnpm build        # 构建静态产物到 dist/
-pnpm preview      # 预览构建结果
+pnpm install
+pnpm dev
+pnpm build
+pnpm preview
 ```
+
+本地开发地址通常是 `http://localhost:4321/`。
 
 ## 项目结构
 
-```
+```text
 personalweb/
-├── src/
-│   ├── components/          # 可复用 UI 与交互组件
-│   │   ├── WorkCard.astro       # 产品卡片
-│   │   ├── PosterCarousel.tsx   # 平面设计轮播（React）
-│   │   └── ThreeAccent.tsx      # 首页 3D 点缀（React + Three.js）
-│   ├── content/
-│   │   ├── config.ts            # 内容集合 Schema
-│   │   └── portfolio/           # 作品 MDX 内容（每篇 = 一条作品）
-│   ├── data/                    # 结构化数据（TS 文件）
-│   │   ├── types.ts             # ★ 全站类型定义
-│   │   ├── posters.ts           # 平面海报数据
-│   │   ├── photography.ts       # 摄影数据
-│   │   ├── honors.ts            # 荣誉数据
-│   │   └── profile.ts           # 关于页数据
-│   ├── layouts/
-│   │   └── BaseLayout.astro     # 全站布局（导航 + 页脚）
-│   ├── pages/                   # 路由
-│   │   ├── index.astro              # 首页（四大模块聚合）
-│   │   ├── about.astro              # 关于
-│   │   ├── portfolio/index.astro    # 产品列表
-│   │   ├── portfolio/[slug].astro   # 产品详情
-│   │   ├── posters.astro            # 平面设计
-│   │   ├── photography.astro        # 摄影
-│   │   └── honors.astro             # 荣誉
-│   └── styles/
-│       └── global.css           # 全局样式
-├── public/assets/               # 静态资源
-│   ├── hero/                        # 首页背景图
-│   ├── portfolio/{slug}/            # 产品图片（按项目分文件夹）
-│   ├── posters/                     # 海报图片
-│   ├── photography/                 # 摄影照片
-│   └── honors/                      # 荣誉证书图片
-├── data-model.md                # ★ 数据模型文档（AI 阅读）
-├── astro.config.mjs             # Astro 配置
-├── netlify.toml                 # Netlify 部署配置
-└── package.json
+  src/
+    components/
+      PageHeader.astro
+      PosterCarousel.tsx
+      ThreeAccent.tsx
+      WorkCard.astro
+    content/
+      config.ts
+      portfolio/*.mdx
+    data/
+      honors.ts
+      photography.ts
+      posters.ts
+      profile.ts
+      types.ts
+    layouts/
+      BaseLayout.astro
+    pages/
+      index.astro
+      portfolio/index.astro
+      portfolio/[slug].astro
+      posters.astro
+      photography.astro
+      honors.astro
+    styles/
+      global.css
+  public/assets/
+  data-model.md
 ```
 
-## 四大模块
+## 四个二级页面
 
-| 模块 | 路由 | 数据源 | 展示方式 |
-|------|------|--------|---------|
-| **产品** | `/portfolio/` | `src/content/portfolio/*.mdx` | 卡片网格 → 详情页 |
-| **平面** | `/posters/` | `src/data/posters.ts` | 轮播 |
-| **摄影** | `/photography/` | `src/data/photography.ts` | 横向沉浸式画廊 |
-| **荣誉** | `/honors/` | `src/data/honors.ts` | 编号列表卡片 |
+| 页面 | 路由 | 数据来源 | 展示方式 |
+| --- | --- | --- | --- |
+| 工业产品 | `/portfolio/` | `src/content/portfolio/*.mdx` | 等宽等高产品卡片，封面完整显示，点击进入详情 |
+| 平面设计 | `/posters/` | `src/data/posters.ts` | React 轮播，图片预载，快速切换时显示加载状态 |
+| 摄影作品 | `/photography/` | `src/data/photography.ts` | 完整清晰的沉浸式单张展示，5 秒随机切换，点击屏幕随机切换，支持 `List` 模式 |
+| 个人成长 | `/honors/` + `src/data/profile.ts` | `src/data/honors.ts` | 自我介绍、教育路径、荣誉墙，支持图片和 Word 等文档 |
 
-另有 **关于** 页（`/about/`），数据来自 `src/data/profile.ts`。
+四个二级页面延续首页的暗色、金色强调和细线分隔，但不使用统一背景底图；作品、海报、照片和荣誉内容本身是视觉主体。进入二级页面、二级页面之间跳转、滚动入场均在 `src/layouts/BaseLayout.astro` 与 `src/styles/global.css` 中统一处理。
 
-## 数据流
+## 内容维护
 
+### 新增工业产品
+
+1. 在 `src/content/portfolio/` 新建 `.mdx` 文件，文件名就是 URL slug。
+2. 填写 frontmatter：`title`、`category`、`cover`、`summary`、`year`、`featured`、`tags`、`gallery`。
+3. 把图片放到 `public/assets/portfolio/{slug}/`。
+4. 在 frontmatter 下方写详情正文。
+
+### 修改平面设计
+
+编辑 `src/data/posters.ts`。每条数据包含 `src`、`title`、`category`。
+
+### 修改摄影作品
+
+编辑 `src/data/photography.ts`。每张照片只需要：
+
+```ts
+{ src: "/assets/photography/lenggacuo-03.jpg", name: "题目 / 地点" }
 ```
-内容/数据文件                类型定义              页面
-─────────────              ─────────            ─────
-MDX frontmatter  ──┐
-posters.ts       ──┤
-photography.ts   ──┼──→  src/data/types.ts  ──→  Astro pages
-honors.ts        ──┤         (接口定义)          (.astro / .tsx)
-profile.ts       ──┘
-```
 
-所有数据入口和字段定义详见 **[data-model.md](./data-model.md)**。
+页面只展示 `name`，后续可直接把 `name` 改成包含题目与地点的完整名称。
 
-## 如何修改内容
+### 修改个人成长与荣誉
 
-### 新增作品
+自我介绍和教育经历来自 `src/data/profile.ts`。荣誉来自 `src/data/honors.ts`，支持图片和文档：
 
-1. 在 `src/content/portfolio/` 下新建 `.mdx` 文件（文件名即 URL slug）
-2. 填写 frontmatter（title, category, cover, summary, year, tags, gallery）
-3. 把图片放到 `public/assets/portfolio/{slug}/`
-4. 正文写在 frontmatter 下方
-
-### 修改海报/摄影/荣誉
-
-直接编辑对应的 `src/data/*.ts` 文件，添加或修改数组条目即可。
-
-### 修改个人介绍
-
-编辑 `src/data/profile.ts`，关于页面会自动更新。
-
-### 修改界面样式
-
-全局样式集中在 `src/styles/global.css`，包含：
-- CSS 变量（颜色、间距）定义在 `:root`
-- 响应式断点：980px / 720px / 480px
-- 自定义滚动条
-
-### 修改导航
-
-编辑 `src/layouts/BaseLayout.astro` 中的 `navItems` 数组。
-
-## 首页背景图调整
-
-首页 hero 背景图在 `src/styles/global.css` 的 `.hero-media::after` 中引用：
-
-```css
-.hero-media::after {
-  background-image: url("/assets/hero/home-hero.jpg");
-  background-position: center var(--hero-image-y);
-  background-size: 100% auto;
+```ts
+{
+  src: "/assets/honors/25工业设计大赛获奖名单.docx",
+  title: "2025 工业设计大赛获奖名单",
+  category: "文档材料",
+  year: "2025",
+  kind: "document"
 }
 ```
 
-图片文件放在 `public/assets/hero/home-hero.jpg`。
+图片类荣誉使用 `kind: "image"`。如需给文档配封面，可增加 `preview` 字段指向图片。
 
-## 资源命名规则
+## 样式与交互位置
 
-使用有意义的英文名称，按模块分文件夹：
-
-```
-public/assets/portfolio/bike-shuttle-robot/cover.jpg
-public/assets/posters/2024-spring-festival.jpg
-public/assets/photography/lenggacuo-01.jpg
-public/assets/honors/2025-industrial-design-second.jpg
-```
+- 全局样式：`src/styles/global.css`
+- 页面过渡、滚动入场：`src/layouts/BaseLayout.astro`
+- 产品卡片：`src/components/WorkCard.astro`
+- 海报轮播：`src/components/PosterCarousel.tsx`
+- 数据模型：`src/data/types.ts` 与 `data-model.md`
 
 ## 备注
 
-- 根目录 `index.html`、`styles.css`、`script.js` 是旧版静态站点，已弃用，保留仅供历史参考
-- 当前正式站点以 Astro 应用为准，Netlify 发布 `dist/`
-- 包管理器统一使用 pnpm，提交 `pnpm-lock.yaml`，不要新增 `package-lock.json`
+- 根目录旧版静态站点文件和 `backup/` 仅作为历史备份参考。
+- 正式构建产物输出到 `dist/`。
+- 包管理器统一使用 pnpm，不新增 `package-lock.json` 或 `yarn.lock`。

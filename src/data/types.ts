@@ -49,20 +49,22 @@ export interface PosterItem {
 /** 单张摄影作品（对应 src/data/photography.ts） */
 export interface PhotographyItem {
   src: string;
-  place: string;
-  note: string;
+  name: string;
 }
 
 /* ── 荣誉 / Honors ── */
 /** 荣誉分类 */
 export type HonorCategory = "工业设计竞赛" | "设计竞赛" | "奖学金" | "文档材料";
+export type HonorKind = "image" | "document";
 
 /** 单条荣誉奖项（对应 src/data/honors.ts） */
 export interface HonorItem {
   src: string;
+  preview?: string;
   title: string;
   category: HonorCategory;
   year: string;
+  kind?: HonorKind;
 }
 
 /* ── 关于 / Profile ── */
