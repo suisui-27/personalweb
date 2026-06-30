@@ -165,3 +165,5 @@ public/assets/
 | 修改字段定义 | `src/data/types.ts` |
 | 修改页面风格 | `src/styles/global.css` |
 | 修改页面过渡 | `src/layouts/BaseLayout.astro` |
+| 修改网站图标/标题 | `public/favicon.png`、`src/layouts/BaseLayout.astro` |
+| 修改工业产品详情返回入口 | `src/pages/portfolio/[slug].astro`、`src/styles/global.css` |

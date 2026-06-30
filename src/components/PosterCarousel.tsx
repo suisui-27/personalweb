@@ -92,18 +92,18 @@ export default function PosterCarousel({ items }: Props) {
   return (
     <div className="poster-carousel" role="region" aria-label="平面设计轮播" aria-busy={isLoading}>
       <div className="poster-viewport">
-        <button
-          type="button"
-          className="poster-btn prev"
-          onClick={() => go(-1)}
-          aria-label="上一张"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-
         <figure className="poster-slide">
+          <button
+            type="button"
+            className="poster-btn prev"
+            onClick={() => go(-1)}
+            aria-label="上一张"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img key={current.src} className="poster-image is-current" src={current.src} alt={current.title} loading="eager" />
           {previousIndex !== null && items[previousIndex] && (
@@ -115,18 +115,18 @@ export default function PosterCarousel({ items }: Props) {
               <strong>{target.title}</strong>
             </figcaption>
           )}
-        </figure>
 
-        <button
-          type="button"
-          className="poster-btn next"
-          onClick={() => go(1)}
-          aria-label="下一张"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
+          <button
+            type="button"
+            className="poster-btn next"
+            onClick={() => go(1)}
+            aria-label="下一张"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        </figure>
 
         <div className="poster-caption">
           <strong className="poster-title">{current.title} — {current.category}</strong>
