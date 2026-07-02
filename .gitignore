@@ -5,4 +5,4 @@ dev-server.log
 preview-server.log
 package-lock.json
 .codebuddy/
-.workbuddy/
+.workbuddy/backup/
