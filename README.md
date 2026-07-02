@@ -63,7 +63,7 @@ personalweb/
 
 ## 页面与响应式规则
 
-所有页面以黑色背景、细线边界、金色强调和克制的动效为统一视觉语言。四个二级页面不使用统一背景底图，内容本身是视觉主体。页面跳转由 `src/layouts/BaseLayout.astro` 中的 GSAP timeline 控制，进入和离开页面时使用黑色覆入/揭开的过渡动画。
+所有页面以黑色背景、细线边界、金色强调和克制的动效为统一视觉语言。四个二级页面不使用统一背景底图，内容本身是视觉主体。进入网站、站内跳转等待和图片素材加载统一使用 `src/layouts/BaseLayout.astro` 中的 3D cube loader。二级页和三级页支持深浅色主题切换，默认深色，浅色状态会写入 `localStorage` 并在页面间保留。
 
 | 页面 | 路由 | 数据来源 | PC 端表现 | 移动端表现 |
 | --- | --- | --- | --- | --- |
@@ -75,7 +75,7 @@ personalweb/
 | 摄影列表 | `/photography/` 内部 List 模式 | `src/data/photography.ts` | 作为摄影页内部状态存在，保持同一导航和暗色风格；列表允许滚动，序号与名称同一行，长名称自动压缩字号 | 同样允许滚动；列表卡片适当增宽，序号与名称保持同一行 |
 | 个人成长 | `/honors/` | `src/data/profile.ts`、`src/data/honors.ts` | 自我介绍、教育经历与荣誉内容分区展示；荣誉支持图片、Word 等文档，布局强调清晰和可扫描 | 内容改为单列阅读流，荣誉卡片随屏幕宽度重排，文本尺寸略收以提升密度 |
 
-二级页面导航栏在 PC 和移动端都保持黑色底色。移动端导航栏中的“主页”和四个入口保持同一行，字号略大于早期版本，避免分成两行。
+二级页面导航栏默认保持黑色底色。深浅色切换按钮位于“个人成长”右侧，PC 和移动端都与四个入口保持同一行；移动端字号略大于早期版本，避免分成两行。
 
 ## 内容维护
 
@@ -119,7 +119,8 @@ personalweb/
 ## 样式与交互位置
 
 - 全局样式：`src/styles/global.css`
-- 页面过渡、滚动入场：`src/layouts/BaseLayout.astro`。页面跳转使用 GSAP timeline 驱动的黑色覆入/揭开动画，favicon 使用 `public/favicon.png`，浏览器标题统一为 `SuisuiGallery`。
+- 全站加载器、素材加载器、滚动入场：`src/layouts/BaseLayout.astro` 与 `src/styles/global.css`。进入网站、站内跳转等待和图片素材加载统一使用 3D cube loader；旧的页面切换翻页/覆入动画已移除。favicon 使用 `public/favicon.png`，浏览器标题统一为 `SuisuiGallery`。
+- 深浅色主题切换：`src/layouts/BaseLayout.astro` 与 `src/styles/global.css`。按钮位于导航栏“个人成长”右侧，使用日/月圆形切换样式；浅色主题通过 `html[data-theme="light"]` 覆盖二级页和三级页的背景、文字、边线、卡片、摄影列表和详情页表面。
 - 工业产品卡片：`src/components/WorkCard.astro` 与 `src/styles/global.css`。组件只输出图片、分类年份、标题和摘要；PC 端卡片固定等高，图片宽度铺满且顶部对齐，允许底部裁切；移动端取消固定高度，图片完整展示。
 - 工业产品详情页：`src/pages/portfolio/[slug].astro` 与 `src/styles/global.css`。三级页面左上方提供返回工业产品列表的入口，PC 为左右分栏，移动端为单列。
 - 平面设计轮播：`src/components/PosterCarousel.tsx` 与 `src/styles/global.css`。React 负责预加载、切换状态和淡入淡出；CSS 控制 PC 端大海报舞台和移动端无滚动布局。
