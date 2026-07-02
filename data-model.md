@@ -12,7 +12,7 @@
 | 个人成长/荣誉 | `src/data/honors.ts` | `HonorItem` | `/honors/` |
 | 自我介绍 | `src/data/profile.ts` | `Profile` | `/honors/` |
 
-全站类型集中在 `src/data/types.ts`。四个二级页面共享暗色、金色强调和 GSAP 页面过渡，但不使用统一背景底图，内容本身是视觉主体。
+全站类型集中在 `src/data/types.ts`。四个二级页面共享暗色、金色强调、3D cube 加载器和深浅色主题切换，但不使用统一背景底图，内容本身是视觉主体。
 
 ## 1. Portfolio / 工业产品
 
@@ -164,6 +164,7 @@ public/assets/
 | 修改自我介绍 | `src/data/profile.ts` |
 | 修改字段定义 | `src/data/types.ts` |
 | 修改页面风格 | `src/styles/global.css` |
-| 修改页面过渡 | `src/layouts/BaseLayout.astro` |
+| 修改全站加载器/素材加载器 | `src/layouts/BaseLayout.astro`、`src/styles/global.css` |
+| 修改深浅色主题切换 | `src/layouts/BaseLayout.astro`、`src/styles/global.css` |
 | 修改网站图标/标题 | `public/favicon.png`、`src/layouts/BaseLayout.astro` |
 | 修改工业产品详情返回入口 | `src/pages/portfolio/[slug].astro`、`src/styles/global.css` |

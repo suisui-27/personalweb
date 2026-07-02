@@ -19,7 +19,6 @@ export default function PosterCarousel({ items }: Props) {
   const [previousIndex, setPreviousIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const current = items[displayIndex];
-  const target = items[index];
 
   const showLoadedImage = useCallback((nextIndex: number) => {
     if (nextIndex === displayIndex) return;
@@ -92,7 +91,7 @@ export default function PosterCarousel({ items }: Props) {
   return (
     <div className="poster-carousel" role="region" aria-label="平面设计轮播" aria-busy={isLoading}>
       <div className="poster-viewport">
-        <figure className="poster-slide">
+        <figure className={`poster-slide${isLoading ? " is-loading" : ""}`}>
           <button
             type="button"
             className="poster-btn prev"
@@ -111,8 +110,16 @@ export default function PosterCarousel({ items }: Props) {
           )}
           {isLoading && (
             <figcaption className="poster-loading">
-              <span>正在载入</span>
-              <strong>{target.title}</strong>
+              <div className="loader">
+                <div className="cube">
+                  <div className="face" />
+                  <div className="face" />
+                  <div className="face" />
+                  <div className="face" />
+                  <div className="face" />
+                  <div className="face" />
+                </div>
+              </div>
             </figcaption>
           )}
 

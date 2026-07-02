@@ -16,6 +16,18 @@ const firstPhoto = photographyItems[0];
     <section class="photo-immersive-panel" data-photo-stage aria-live="polite">
       <img class="photo-bg is-active" src={firstPhoto.src} alt={firstPhoto.name} data-photo-layer="0" />
       <img class="photo-bg" src="" alt="" aria-hidden="true" data-photo-layer="1" />
+      <div class="asset-loader photo-stage-loader" aria-hidden="true">
+        <div class="loader">
+          <div class="cube">
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+          </div>
+        </div>
+      </div>
 
       <button class="photo-hit-area" type="button" data-photo-random-next aria-label="切换下一张摄影作品"></button>
     </section>

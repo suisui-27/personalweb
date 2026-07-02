@@ -31,6 +31,13 @@ const noPageScroll = Astro.url.pathname === "/posters/" || Astro.url.pathname ==
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <link rel="icon" type="image/png" href="/favicon.png" />
+    <script is:inline>
+      try {
+        if (localStorage.getItem("suisui-theme") === "light") {
+          document.documentElement.dataset.theme = "light";
+        }
+      } catch {}
+    </script>
     <title>{documentTitle}</title>
   </head>
   <body class={noPageScroll ? "no-page-scroll" : undefined}>
@@ -44,14 +51,27 @@ const noPageScroll = Astro.url.pathname === "/posters/" || Astro.url.pathname ==
             {navItems.map(([href, label]) => (
               <a href={href} aria-current={Astro.url.pathname === href ? "page" : undefined}>{label}</a>
             ))}
+            <label class="theme-toggle" aria-label="切换深浅色主题">
+              <input type="checkbox" data-theme-toggle />
+              <span class="circle">
+                <span class="crescent"></span>
+              </span>
+            </label>
           </nav>
         </header>
       )}
       <slot />
-      <div class="page-transition" aria-hidden="true">
-        <div class="page-turn page-turn-back"></div>
-        <div class="page-turn page-turn-front"></div>
-        <div class="page-turn page-turn-spine"></div>
+      <div class="site-loader" data-site-loader aria-hidden="true">
+        <div class="loader">
+          <div class="cube">
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+          </div>
+        </div>
       </div>
     </div>
     <script>
@@ -61,10 +81,48 @@ const noPageScroll = Astro.url.pathname === "/posters/" || Astro.url.pathname ==
       gsap.registerPlugin(ScrollTrigger);
 
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const transition = document.querySelector(".page-transition");
-      const pageTurnFront = document.querySelector(".page-turn-front");
-      const pageTurnBack = document.querySelector(".page-turn-back");
-      const pageTurnSpine = document.querySelector(".page-turn-spine");
+      const siteLoader = document.querySelector<HTMLElement>("[data-site-loader]");
+      const themeToggle = document.querySelector<HTMLInputElement>("[data-theme-toggle]");
+      const loaderMarkup = `
+        <div class="loader">
+          <div class="cube">
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+          </div>
+        </div>
+      `;
+
+      const showSiteLoader = () => {
+        siteLoader?.classList.remove("is-hidden");
+        siteLoader?.classList.add("is-visible");
+      };
+
+      const hideSiteLoader = () => {
+        siteLoader?.classList.remove("is-visible");
+        siteLoader?.classList.add("is-hidden");
+      };
+
+      const setTheme = (theme: "dark" | "light") => {
+        if (theme === "light") {
+          document.documentElement.dataset.theme = "light";
+        } else {
+          document.documentElement.removeAttribute("data-theme");
+        }
+
+        if (themeToggle) themeToggle.checked = theme === "light";
+
+        try {
+          localStorage.setItem("suisui-theme", theme);
+        } catch {}
+      };
+
+      const currentTheme = document.documentElement.dataset.theme === "light" ? "light" : "dark";
+      setTheme(currentTheme);
+      themeToggle?.addEventListener("change", () => setTheme(themeToggle.checked ? "light" : "dark"));
 
       const stealthLinks = () => {
         document.querySelectorAll<HTMLAnchorElement>("a[href]").forEach((link) => {
@@ -80,7 +138,7 @@ const noPageScroll = Astro.url.pathname === "/posters/" || Astro.url.pathname ==
 
       stealthLinks();
 
-      const navigateWithTransition = (target: HTMLAnchorElement) => {
+      const navigateWithLoader = (target: HTMLAnchorElement) => {
         const href = target.dataset.navHref;
         if (!href || target.hasAttribute("download")) return;
         const url = new URL(href, window.location.href);
@@ -90,36 +148,17 @@ const noPageScroll = Astro.url.pathname === "/posters/" || Astro.url.pathname ==
         }
         if (url.pathname === window.location.pathname && url.search === window.location.search) return;
 
-        if (!transition || reduceMotion) {
+        showSiteLoader();
+        window.setTimeout(() => {
           window.location.href = url.href;
-          return;
-        }
-
-        gsap.killTweensOf([transition, pageTurnFront, pageTurnBack, pageTurnSpine]);
-        gsap.set(transition, { autoAlpha: 1, visibility: "visible" });
-        gsap.set(pageTurnBack, { autoAlpha: 0 });
-        gsap.set(pageTurnFront, { autoAlpha: 1, xPercent: 100 });
-        gsap.set(pageTurnSpine, { autoAlpha: 0, xPercent: 100 });
-
-        gsap
-          .timeline({
-            defaults: { ease: "power3.inOut" },
-            onComplete: () => {
-              window.location.href = url.href;
-            },
-          })
-          .addLabel("turn", 0)
-          .to(pageTurnBack, { autoAlpha: 1, duration: 0.2, ease: "power2.out" }, "turn")
-          .to([pageTurnFront, pageTurnSpine], { xPercent: 0, duration: 0.62 }, "turn")
-          .to(pageTurnSpine, { autoAlpha: 0.62, duration: 0.18, ease: "power2.out" }, "turn+=0.08")
-          .to("main, .site-header", { autoAlpha: 0.34, duration: 0.36, ease: "power2.out" }, "turn+=0.1");
+        }, 120);
       };
 
       document.addEventListener("click", (event) => {
         const target = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[data-nav-href]") : null;
         if (!target || event.defaultPrevented) return;
         event.preventDefault();
-        navigateWithTransition(target);
+        navigateWithLoader(target);
       });
 
       document.addEventListener("keydown", (event) => {
@@ -127,24 +166,70 @@ const noPageScroll = Astro.url.pathname === "/posters/" || Astro.url.pathname ==
         const target = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[data-nav-href]") : null;
         if (!target) return;
         event.preventDefault();
-        navigateWithTransition(target);
+        navigateWithLoader(target);
       });
 
-      if (transition && !reduceMotion) {
-        gsap.set(transition, { autoAlpha: 1, visibility: "visible" });
-        gsap.set(pageTurnBack, { autoAlpha: 1 });
-        gsap.set(pageTurnFront, { autoAlpha: 1, xPercent: 0 });
-        gsap.set(pageTurnSpine, { autoAlpha: 0.62, xPercent: 0 });
+      const setImageLoading = (image: HTMLImageElement) => {
+        if (!image.currentSrc && !image.src) return;
+        if (image.closest(".loader, .asset-loader, .site-loader")) return;
+        const parent = image.parentElement;
+        if (!parent) return;
 
+        parent.classList.add("has-asset-loader");
+        let loader = parent.querySelector<HTMLElement>(":scope > .asset-loader");
+        if (!loader) {
+          loader = document.createElement("div");
+          loader.className = "asset-loader";
+          loader.setAttribute("aria-hidden", "true");
+          loader.innerHTML = loaderMarkup;
+          parent.appendChild(loader);
+        }
+
+        const hideAssetLoader = () => {
+          parent.classList.remove("is-asset-loading");
+          loader?.classList.add("is-hidden");
+        };
+
+        if (image.complete && image.naturalWidth > 0) {
+          hideAssetLoader();
+          return;
+        }
+
+        loader.classList.remove("is-hidden");
+        parent.classList.add("is-asset-loading");
+        image.addEventListener("load", hideAssetLoader, { once: true });
+        image.addEventListener("error", hideAssetLoader, { once: true });
+      };
+
+      const bindImageLoaders = (root: ParentNode = document) => {
+        root.querySelectorAll<HTMLImageElement>("img").forEach(setImageLoading);
+      };
+
+      bindImageLoaders();
+      const mediaObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === "attributes" && mutation.target instanceof HTMLImageElement) {
+            setImageLoading(mutation.target);
+            return;
+          }
+
+          mutation.addedNodes.forEach((node) => {
+            if (!(node instanceof Element)) return;
+            if (node instanceof HTMLImageElement) setImageLoading(node);
+            bindImageLoaders(node);
+          });
+        });
+      });
+      mediaObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["src", "srcset"] });
+
+      window.addEventListener("load", hideSiteLoader, { once: true });
+      window.addEventListener("pageshow", hideSiteLoader);
+
+      if (!reduceMotion) {
         gsap
           .timeline({ defaults: { ease: "power3.out" } })
-          .addLabel("open", 0)
-          .to([pageTurnFront, pageTurnSpine], { xPercent: -100, duration: 0.68, ease: "power3.inOut" }, "open")
-          .to(pageTurnBack, { autoAlpha: 0, duration: 0.24, ease: "power2.out" }, "open+=0.48")
-          .to(transition, { autoAlpha: 0, duration: 0.18 }, "open+=0.58")
-          .from(".site-header", { y: -10, autoAlpha: 0, duration: 0.34 }, "open+=0.16")
-          .from("main > section, main > .photo-immersive-panel", { y: 10, autoAlpha: 0, duration: 0.46, stagger: 0.04 }, "open+=0.2")
-          .set(transition, { visibility: "hidden" });
+          .from(".site-header", { y: -10, autoAlpha: 0, duration: 0.34 }, 0.08)
+          .from("main > section, main > .photo-immersive-panel", { y: 10, autoAlpha: 0, duration: 0.46, stagger: 0.04 }, 0.12);
 
         ScrollTrigger.batch(".reveal-item, .work-card, .honor-tile, .photo-list-item", {
           start: "top 88%",
@@ -152,10 +237,6 @@ const noPageScroll = Astro.url.pathname === "/posters/" || Astro.url.pathname ==
           onEnter: (elements) => {
             gsap.fromTo(elements, { y: 24, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.62, stagger: 0.06, ease: "power2.out" });
           },
-        });
-
-        window.addEventListener("pageshow", () => {
-          gsap.to(transition, { autoAlpha: 0, duration: 0.28, overwrite: true, onComplete: () => gsap.set(transition, { visibility: "hidden" }) });
         });
       }
     </script>
