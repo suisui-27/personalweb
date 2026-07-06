@@ -17,8 +17,8 @@ export const profile: Profile = {
   ],
   education: [
     {
-      period: "2024 — 至今",
-      school: "中国农业大学",
+      period: "2025 — 至今",
+      school: "哈尔滨工业大学",
       major: "机械工程",
       degree: "硕士研究生",
     },
