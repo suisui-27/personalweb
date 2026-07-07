@@ -59,6 +59,7 @@ export type HonorKind = "image" | "document";
 
 /** 单条荣誉奖项（对应 src/data/honors.ts） */
 export interface HonorItem {
+  slug: string;
   src: string;
   preview?: string;
   title: string;
