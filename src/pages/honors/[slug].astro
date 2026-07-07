@@ -1,0 +1,43 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { honorItems } from "../../data/honors";
+
+export function getStaticPaths() {
+  return honorItems.map((honor) => ({
+    params: { slug: honor.slug },
+    props: { honor },
+  }));
+}
+
+const { honor } = Astro.props;
+const isDocument = honor.kind === "document";
+---
+
+<BaseLayout title={`${honor.title} | 个人成长`}>
+  <main class="honor-detail-page">
+    <a class="project-back-link" href="/honors/">返回个人成长</a>
+
+    <section class="honor-detail-hero">
+      <div class="honor-detail-copy">
+        <p class="leadership-kicker">{honor.category}</p>
+        <h1>{honor.title}</h1>
+        <p>{honor.year}</p>
+      </div>
+    </section>
+
+    <section class="honor-detail-proof" aria-label="奖项证明">
+      {isDocument ? (
+        <div class="honor-document-panel">
+          <span>DOCX</span>
+          <h2>{honor.title}</h2>
+          <a class="button" href={honor.src} target="_blank" rel="noreferrer">打开文档</a>
+        </div>
+      ) : (
+        <figure>
+          <img src={honor.src} alt={honor.title} />
+          <figcaption>{honor.title}</figcaption>
+        </figure>
+      )}
+    </section>
+  </main>
+</BaseLayout>
