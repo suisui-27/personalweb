@@ -2,18 +2,12 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { honorItems } from "../data/honors";
 import { profile } from "../data/profile";
-import selfIntroText from "../../自我介绍.txt?raw";
+import { selfIntro } from "../data/selfIntro";
 
-const introLines = selfIntroText.trim().split(/\r?\n/);
-const displayName = introLines[0] || profile.name;
-const role = introLines[1] || "哈尔滨工业大学机械工程硕士";
-const discipline = introLines[2] || profile.tagline;
-const introParagraphs = selfIntroText
-  .trim()
-  .split(/\r?\n\s*\r?\n/)
-  .slice(1)
-  .map((paragraph) => paragraph.replace(/\s*\r?\n\s*/g, " ").trim())
-  .filter(Boolean);
+const displayName = selfIntro.name || profile.name;
+const role = selfIntro.role || "哈尔滨工业大学机械工程硕士";
+const discipline = selfIntro.discipline || profile.tagline;
+const introParagraphs = selfIntro.paragraphs;
 
 const educationRecords = profile.education.slice(0, 2);
 ---
