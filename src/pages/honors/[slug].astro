@@ -20,7 +20,7 @@ const isDocument = honor.kind === "document";
     <section class="honor-detail-hero">
       <div class="honor-detail-copy">
         <p class="leadership-kicker">{honor.category}</p>
-        <h1>{honor.title}</h1>
+        <h1 style={`--title-chars: ${Math.max(honor.title.length, 1)}`}>{honor.title}</h1>
         <p>{honor.year}</p>
       </div>
     </section>

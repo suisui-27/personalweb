@@ -1,18 +1,17 @@
-# Data Model / 数据模型文档
+# Data Model / 数据模型
 
-本文档描述站点内容入口、字段结构和页面消费关系。修改内容时优先编辑对应的数据文件或 MDX frontmatter。
+本文档记录站点内容入口、字段结构和页面消费关系。修改内容时优先编辑对应数据文件或 MDX frontmatter；少量页面展示文案目前直接维护在页面模板中。
 
 ## 总览
 
 | 模块 | 数据入口 | 类型定义 | 页面 |
 | --- | --- | --- | --- |
-| 工业产品 | `src/content/portfolio/*.mdx` | `src/content/config.ts` + `src/data/types.ts` | `/portfolio/`、`/portfolio/[slug]/` |
+| 工业产品 | `src/content/portfolio/*.mdx` | `src/content/config.ts`、`src/data/types.ts` | `/portfolio/`、`/portfolio/[slug]/` |
 | 平面设计 | `src/data/posters.ts` | `PosterItem` | `/posters/` |
 | 摄影作品 | `src/data/photography.ts` | `PhotographyItem` | `/photography/` |
-| 个人成长/荣誉 | `src/data/honors.ts` | `HonorItem` | `/honors/` |
-| 自我介绍 | `src/data/profile.ts` | `Profile` | `/honors/` |
-
-全站类型集中在 `src/data/types.ts`。四个二级页面共享暗色、金色强调、3D cube 加载器和深浅色主题切换，但不使用统一背景底图，内容本身是视觉主体。
+| 个人介绍正文 | `src/data/selfIntro.ts` | 轻量对象，未集中进 `types.ts` | `/honors/` |
+| 荣誉奖项 | `src/data/honors.ts` | `HonorItem` | `/honors/`、`/honors/[slug]/` |
+| 旧版个人资料 | `src/data/profile.ts` | `Profile` | 当前不再作为 `/honors/` 主展示数据源 |
 
 ## 1. Portfolio / 工业产品
 
@@ -25,20 +24,20 @@
 | 卡片组件 | `src/components/WorkCard.astro` |
 | 图片目录 | `public/assets/portfolio/{slug}/` |
 
-### Frontmatter
+### Frontmatter 字段
 
 | 字段 | 类型 | 必填 | 默认值 | 说明 |
 | --- | --- | --- | --- | --- |
 | `title` | `string` | 是 | - | 产品标题 |
-| `category` | `PortfolioCategory` | 是 | - | `"3D 模型"` / `"产品设计"` / `"产品概念"` / `"界面设计"` |
+| `category` | `PortfolioCategory` | 是 | - | 分类 |
 | `cover` | `string` | 是 | - | 封面路径 |
 | `summary` | `string` | 是 | - | 摘要 |
 | `year` | `string` | 是 | - | 年份 |
-| `featured` | `boolean` | 否 | `false` | 是否作为精选内容 |
+| `featured` | `boolean` | 否 | `false` | 是否精选 |
 | `tags` | `string[]` | 否 | `[]` | 标签 |
-| `gallery` | `{ src, caption }[]` | 否 | `[]` | 详情页图廊 |
+| `gallery` | `{ src, caption }[]` | 否 | `[]` | 详情页图片 |
 
-工业产品列表页使用等宽等高卡片，封面图固定 `object-fit: contain`，保证预览图片完整显示。
+工业产品详情页标题使用 `--title-chars` 按标题字数动态计算字号，目标是保持单行显示。详情页主要内容宽度为 `1060px`。
 
 ## 2. Posters / 平面设计
 
@@ -58,8 +57,6 @@
 | `title` | `string` | 海报标题 |
 | `category` | `PosterCategory` | 分类 |
 
-`PosterCarousel` 会预载图片。快速切换时，目标图片未完成加载前保留当前图并显示加载提示，避免出现状态切换但图片停留在旧图的问题。
-
 ## 3. Photography / 摄影作品
 
 | 属性 | 说明 |
@@ -74,72 +71,98 @@
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | `src` | `string` | 照片路径 |
-| `name` | `string` | 展示名称，建议包含题目与地点 |
+| `name` | `string` | 展示名称，建议包含题目或地点 |
 
-摄影页是沉浸式单张展示：
+摄影页内部有两种状态：
 
-- 每 5 秒随机切换一张。
-- 点击屏幕随机切换一张。
-- 点击 `List` 进入列表。
-- 点击列表元素后关闭列表并进入对应照片的沉浸式展示。
+- 沉浸式单张照片展示。
+- `List` 列表模式，按钮会切换为 `Back`，按钮宽度固定以避免抖动。
 
-## 4. Honors / 个人成长与荣誉
+## 4. Personal Growth / 个人成长
 
 | 属性 | 说明 |
 | --- | --- |
-| 荣誉数据 | `src/data/honors.ts` |
-| 自我介绍数据 | `src/data/profile.ts` |
-| 类型 | `HonorItem`、`Profile` |
 | 页面 | `src/pages/honors.astro` |
+| 自我介绍正文 | `src/data/selfIntro.ts` |
+| 荣誉数据 | `src/data/honors.ts` |
+| 人物图片 | `public/assets/profile/home-portrait-cutout.png` |
+
+### `selfIntro.ts`
+
+当前页面使用：
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `name` | `string` | 页面姓名，当前为 `Li Suisui` |
+| `paragraphs` | `string[]` | 自我介绍段落 |
+
+`role`、`discipline` 若存在于 `selfIntro.ts`，当前页面不再直接读取；顶部身份文案改为页面模板内维护。
+
+### 页面内维护的身份与教育经历
+
+在 `src/pages/honors.astro` 中维护：
+
+```ts
+const educationItems = [
+  {
+    period: "2025 — 至今",
+    school: "哈尔滨工业大学",
+    major: "机械工程",
+  },
+  {
+    period: "2021 — 2025",
+    school: "中国农业大学",
+    major: "机械类 · 工业设计",
+  },
+];
+```
+
+页面顶部展示：
+
+```text
+Li Suisui
+哈尔滨工业大学机械工程硕士
+工业设计背景 / 机械工程方向
+```
+
+教育经历显示在方向说明下方，按日期、学校、专业三列左对齐。
+
+## 5. Honors / 荣誉奖项
+
+| 属性 | 说明 |
+| --- | --- |
+| 数据源 | `src/data/honors.ts` |
+| 类型 | `HonorItem` |
+| 列表消费 | `src/pages/honors.astro` |
+| 详情页 | `src/pages/honors/[slug].astro` |
 | 文件目录 | `public/assets/honors/` |
 
 ### HonorItem 字段
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
+| `slug` | `string` | URL slug |
 | `src` | `string` | 图片或文档路径 |
-| `preview` | `string | undefined` | 可选预览图，常用于文档类荣誉 |
+| `preview` | `string | undefined` | 可选预览图 |
 | `title` | `string` | 荣誉标题 |
 | `category` | `HonorCategory` | 荣誉分类 |
 | `year` | `string` | 年份或学年 |
-| `kind` | `"image" | "document" | undefined` | 文件类型，默认可按图片处理 |
+| `kind` | `"image" | "document" | undefined` | 文件类型 |
 
-图片荣誉示例：
+列表页目前只展示荣誉标题，样式保持简洁。详情页标题与工业产品详情页一致，使用 `--title-chars` 动态计算字号，目标是单行显示。
+
+### 示例
 
 ```ts
 {
+  slug: "2025-industrial-design-second",
   src: "/assets/honors/2025-industrial-design-second.jpg",
-  title: "2025 年全国大学生工业设计大赛北京市二等奖",
+  title: "全国大学生工业设计大赛北京市二等奖",
   category: "工业设计竞赛",
   year: "2025",
   kind: "image"
 }
 ```
-
-文档荣誉示例：
-
-```ts
-{
-  src: "/assets/honors/25工业设计大赛获奖名单.docx",
-  title: "2025 工业设计大赛获奖名单",
-  category: "文档材料",
-  year: "2025",
-  kind: "document"
-}
-```
-
-### Profile 字段
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| `name` | `string` | 姓名或署名 |
-| `tagline` | `string` | 一句话定位 |
-| `bio` | `string[]` | 自我介绍段落 |
-| `education` | `EducationRecord[]` | 教育经历 |
-| `skills` | `SkillGroup[]` | 技能分组 |
-| `interests` | `string[]` | 兴趣方向 |
-
-当前 `/honors/` 页面会使用 `profile.tagline`、`profile.bio` 和 `profile.education` 组成个人成长叙事。
 
 ## 资源目录
 
@@ -150,6 +173,7 @@ public/assets/
   posters/
   photography/
   honors/
+  profile/
   readme/
 ```
 
@@ -157,14 +181,13 @@ public/assets/
 
 | 目标 | 修改文件 |
 | --- | --- |
-| 新增/修改工业产品 | `src/content/portfolio/*.mdx` |
-| 新增/修改平面海报 | `src/data/posters.ts` |
-| 新增/修改摄影作品 | `src/data/photography.ts` |
-| 新增/修改荣誉文件 | `src/data/honors.ts` |
-| 修改自我介绍 | `src/data/profile.ts` |
-| 修改字段定义 | `src/data/types.ts` |
+| 新增或修改工业产品 | `src/content/portfolio/*.mdx` |
+| 新增或修改平面海报 | `src/data/posters.ts` |
+| 新增或修改摄影作品 | `src/data/photography.ts` |
+| 修改个人介绍段落 | `src/data/selfIntro.ts` |
+| 修改个人成长页顶部身份与教育经历 | `src/pages/honors.astro` |
+| 新增或修改荣誉文件 | `src/data/honors.ts` |
+| 修改字段类型 | `src/data/types.ts` |
 | 修改页面风格 | `src/styles/global.css` |
-| 修改全站加载器/素材加载器 | `src/layouts/BaseLayout.astro`、`src/styles/global.css` |
-| 修改深浅色主题切换 | `src/layouts/BaseLayout.astro`、`src/styles/global.css` |
-| 修改网站图标/标题 | `public/favicon.png`、`src/layouts/BaseLayout.astro` |
-| 修改工业产品详情返回入口 | `src/pages/portfolio/[slug].astro`、`src/styles/global.css` |
+| 修改全站加载器或主题切换 | `src/layouts/BaseLayout.astro`、`src/styles/global.css` |
+| 修改三级详情页返回入口或标题行为 | `src/pages/portfolio/[slug].astro`、`src/pages/honors/[slug].astro`、`src/styles/global.css` |
