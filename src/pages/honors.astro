@@ -1,15 +1,22 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { honorItems } from "../data/honors";
-import { profile } from "../data/profile";
 import { selfIntro } from "../data/selfIntro";
 
-const displayName = selfIntro.name || profile.name;
-const role = selfIntro.role || "哈尔滨工业大学机械工程硕士";
-const discipline = selfIntro.discipline || profile.tagline;
+const displayName = selfIntro.name || "Li Suisui";
+const educationItems = [
+  {
+    period: "2025 — 至今",
+    school: "哈尔滨工业大学",
+    major: "机械工程",
+  },
+  {
+    period: "2021 — 2025",
+    school: "中国农业大学",
+    major: "机械类 · 工业设计",
+  },
+];
 const introParagraphs = selfIntro.paragraphs;
-
-const educationRecords = profile.education.slice(0, 2);
 ---
 
 <BaseLayout title="个人成长 | 个人作品集">
@@ -18,8 +25,17 @@ const educationRecords = profile.education.slice(0, 2);
       <div class="leadership-hero-inner">
         <div class="leadership-title-block reveal-item">
           <h1 id="growth-title">{displayName}</h1>
-          <p class="leadership-role">{role}</p>
-          <p class="leadership-discipline">{discipline}</p>
+          <p class="leadership-role">哈尔滨工业大学机械工程硕士</p>
+          <p class="leadership-discipline">工业设计背景 / 机械工程方向</p>
+          <ul class="leadership-education-list leadership-education-list--hero" aria-label="教育经历">
+            {educationItems.map((item) => (
+              <li>
+                <span>{item.period}</span>
+                <strong>{item.school}</strong>
+                <em>{item.major}</em>
+              </li>
+            ))}
+          </ul>
         </div>
         <figure class="leadership-portrait reveal-item">
           <img src="/assets/profile/home-portrait-cutout.png" alt={`${displayName}个人主页照片`} />
@@ -27,42 +43,27 @@ const educationRecords = profile.education.slice(0, 2);
       </div>
     </section>
 
-    <section class="leadership-bio" aria-label="个人介绍">
-      <div class="leadership-bio-grid">
-        <aside class="leadership-education reveal-item" aria-label="教育背景">
-          <p>教育背景</p>
-          {educationRecords.map((item) => (
-            <article>
-              <span>{item.period}</span>
-              <strong>{item.school}</strong>
-              <small>{item.major} / {item.degree}</small>
-            </article>
-          ))}
-        </aside>
-
-        <div class="leadership-copy">
+    <section class="leadership-main" aria-label="个人介绍与荣誉奖项">
+      <div class="leadership-main-grid">
+        <div class="leadership-copy" aria-label="个人介绍">
           {introParagraphs.map((paragraph) => <p class="reveal-item">{paragraph}</p>)}
         </div>
-      </div>
-    </section>
 
-    <section class="leadership-honors" aria-labelledby="honors-title">
-      <div class="leadership-section-head reveal-item">
-        <p>Honors</p>
-        <h2 id="honors-title">荣誉奖项</h2>
-      </div>
+        <section class="leadership-honors" aria-labelledby="honors-title">
+          <div class="leadership-section-head reveal-item">
+            <p id="honors-title">Honors</p>
+          </div>
 
-      <div class="leadership-honor-list">
-        {honorItems.map((honor) => (
-          <a class="leadership-honor-row reveal-item" href={`/honors/${honor.slug}/`}>
-            <span class="leadership-honor-year">{honor.year}</span>
-            <span class="leadership-honor-copy">
-              <small>{honor.category}</small>
-              <strong>{honor.title}</strong>
-            </span>
-            <span class="leadership-honor-action">查看详情</span>
-          </a>
-        ))}
+          <div class="leadership-honor-list">
+            {honorItems.map((honor) => (
+              <a class="leadership-honor-row reveal-item" href={`/honors/${honor.slug}/`}>
+                <span class="leadership-honor-copy">
+                  <strong>{honor.title}</strong>
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
       </div>
     </section>
   </main>

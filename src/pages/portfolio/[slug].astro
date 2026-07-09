@@ -20,7 +20,7 @@ const { Content } = await render(entry);
     <section class="article-hero">
       <div>
         <p class="eyebrow">{entry.data.category} / {entry.data.year}</p>
-        <h1>{entry.data.title}</h1>
+        <h1 style={`--title-chars: ${Math.max(entry.data.title.length, 1)}`}>{entry.data.title}</h1>
         <p class="muted">{entry.data.summary}</p>
         <div class="tag-list">
           {entry.data.tags.map((tag) => <span>{tag}</span>)}
