@@ -3636,7 +3636,9 @@ html[data-theme="light"] .leadership-main {
 
 .leadership-education-list {
   display: grid;
-  gap: 8px;
+  grid-template-columns: max-content max-content minmax(0, max-content);
+  column-gap: clamp(10px, 1.2vw, 16px);
+  row-gap: 8px;
   margin: 0 0 clamp(22px, 3vw, 34px);
   padding: 0 0 clamp(18px, 2.4vw, 28px);
   color: var(--leadership-copy-color);
@@ -3645,10 +3647,7 @@ html[data-theme="light"] .leadership-main {
 }
 
 .leadership-education-list li {
-  display: grid;
-  grid-template-columns: max-content max-content minmax(0, max-content);
-  gap: clamp(10px, 1.2vw, 16px);
-  align-items: baseline;
+  display: contents;
 }
 
 .leadership-education-list span,
@@ -3754,8 +3753,11 @@ html[data-theme="light"] .leadership-main {
   }
 
   .leadership-education-list li {
-    grid-template-columns: max-content max-content minmax(0, max-content);
-    gap: 8px;
+    display: contents;
+  }
+
+  .leadership-education-list {
+    column-gap: 8px;
   }
 
   .leadership-education-list span,
