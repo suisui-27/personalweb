@@ -43,6 +43,7 @@ export interface PosterItem {
   src: string;
   title: string;
   category: PosterCategory;
+  summary: string;
 }
 
 /* ── 摄影 / Photography ── */
@@ -50,22 +51,29 @@ export interface PosterItem {
 export interface PhotographyItem {
   src: string;
   name: string;
+  location: string;
 }
 
 /* ── 荣誉 / Honors ── */
 /** 荣誉分类 */
 export type HonorCategory = "工业设计竞赛" | "设计竞赛" | "奖学金" | "文档材料";
-export type HonorKind = "image" | "document";
+export type HonorKind = "image" | "document" | "pending";
+
+export interface HonorMaterial {
+  src: string;
+  title: string;
+  kind: Exclude<HonorKind, "pending">;
+  label?: string;
+}
 
 /** 单条荣誉奖项（对应 src/data/honors.ts） */
 export interface HonorItem {
   slug: string;
-  src: string;
-  preview?: string;
   title: string;
   category: HonorCategory;
   year: string;
-  kind?: HonorKind;
+  displayYear?: string;
+  materials: HonorMaterial[];
 }
 
 /* ── 关于 / Profile ── */

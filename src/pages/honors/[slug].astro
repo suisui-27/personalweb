@@ -10,7 +10,7 @@ export function getStaticPaths() {
 }
 
 const { honor } = Astro.props;
-const isDocument = honor.kind === "document";
+const materials = honor.materials ?? [];
 ---
 
 <BaseLayout title={`${honor.title} | 个人成长`}>
@@ -26,17 +26,26 @@ const isDocument = honor.kind === "document";
     </section>
 
     <section class="honor-detail-proof" aria-label="奖项证明">
-      {isDocument ? (
+      {materials.length === 0 ? (
         <div class="honor-document-panel">
-          <span>DOCX</span>
-          <h2>{honor.title}</h2>
-          <a class="button" href={honor.src} target="_blank" rel="noreferrer">打开文档</a>
+          <span>Pending</span>
+          <h2>证明材料待补充</h2>
         </div>
       ) : (
-        <figure>
-          <img src={honor.src} alt={honor.title} />
-          <figcaption>{honor.title}</figcaption>
-        </figure>
+        materials.map((material) =>
+          material.kind === "image" ? (
+            <figure>
+              <img src={material.src} alt={`${honor.title} - ${material.title}`} />
+              <figcaption>{material.title}</figcaption>
+            </figure>
+          ) : (
+            <div class="honor-document-panel honor-document-panel--secondary">
+              <span>{material.label ?? "FILE"}</span>
+              <h2>{material.title}</h2>
+              <a class="button" href={material.src} target="_blank" rel="noreferrer">打开材料</a>
+            </div>
+          )
+        )
       )}
     </section>
   </main>

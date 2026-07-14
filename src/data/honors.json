@@ -1,0 +1,53 @@
+[
+  {
+    "slug": "2025-2026-hit-scholarship-first",
+    "title": "哈尔滨工业大学一等奖学金",
+    "category": "奖学金",
+    "year": "2025-2026",
+    "displayYear": "2026",
+    "materials": []
+  },
+  {
+    "slug": "2025-industrial-design-second",
+    "title": "全国大学生工业设计大赛北京市二等奖",
+    "category": "工业设计竞赛",
+    "year": "2025",
+    "displayYear": "2025",
+    "materials": [
+      { "src": "/assets/honors/2025-industrial-design-second.jpg", "title": "获奖证书", "kind": "image", "label": "JPG" },
+      { "src": "/assets/honors/25工业设计大赛获奖名单.docx", "title": "工业设计大赛获奖名单", "kind": "document", "label": "DOCX" }
+    ]
+  },
+  {
+    "slug": "2024-advertising-art-second",
+    "title": "全国大学生广告艺术大赛北京市二等奖",
+    "category": "设计竞赛",
+    "year": "2024",
+    "displayYear": "2024",
+    "materials": [{ "src": "/assets/honors/2024-advertising-art-second.jpg", "title": "获奖证书", "kind": "image", "label": "JPG" }]
+  },
+  {
+    "slug": "2023-cultural-creative-design-third",
+    "title": "北京市大学生文创设计大赛三等奖",
+    "category": "设计竞赛",
+    "year": "2023",
+    "displayYear": "2023",
+    "materials": [{ "src": "/assets/honors/2023-cultural-creative-design-third.jpg", "title": "获奖证书", "kind": "image", "label": "JPG" }]
+  },
+  {
+    "slug": "2022-2023-scholarship-third",
+    "title": "中国农业大学三等奖学金",
+    "category": "奖学金",
+    "year": "2022-2023",
+    "displayYear": "2023",
+    "materials": [{ "src": "/assets/honors/2022-2023-scholarship-third.jpg", "title": "获奖证书", "kind": "image", "label": "JPG" }]
+  },
+  {
+    "slug": "2021-2022-scholarship-second",
+    "title": "中国农业大学二等奖学金",
+    "category": "奖学金",
+    "year": "2021-2022",
+    "displayYear": "2022",
+    "materials": [{ "src": "/assets/honors/2021-2022-scholarship-second.jpg", "title": "获奖证书", "kind": "image", "label": "JPG" }]
+  }
+]

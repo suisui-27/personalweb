@@ -45,9 +45,15 @@ const introParagraphs = selfIntro.paragraphs;
 
     <section class="leadership-main" aria-label="个人介绍与荣誉奖项">
       <div class="leadership-main-grid">
-        <div class="leadership-copy" aria-label="个人介绍">
-          {introParagraphs.map((paragraph) => <p class="reveal-item">{paragraph}</p>)}
-        </div>
+        <section class="leadership-about" aria-labelledby="about-title">
+          <div class="leadership-section-head reveal-item">
+            <p id="about-title">About</p>
+          </div>
+
+          <div class="leadership-copy" aria-label="个人介绍">
+            {introParagraphs.map((paragraph) => <p class="reveal-item" set:html={paragraph} />)}
+          </div>
+        </section>
 
         <section class="leadership-honors" aria-labelledby="honors-title">
           <div class="leadership-section-head reveal-item">
@@ -57,6 +63,7 @@ const introParagraphs = selfIntro.paragraphs;
           <div class="leadership-honor-list">
             {honorItems.map((honor) => (
               <a class="leadership-honor-row reveal-item" href={`/honors/${honor.slug}/`}>
+                <span class="leadership-honor-year">{honor.displayYear ?? honor.year}</span>
                 <span class="leadership-honor-copy">
                   <strong>{honor.title}</strong>
                 </span>

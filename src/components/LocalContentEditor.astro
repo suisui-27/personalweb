@@ -1,0 +1,332 @@
+<dialog class="local-editor-dialog" data-local-editor-dialog aria-labelledby="local-editor-title">
+  <div class="local-editor-shell">
+    <header class="local-editor-head">
+      <div>
+        <p>Local Studio</p>
+        <h2 id="local-editor-title">内容编辑</h2>
+      </div>
+      <p class="local-editor-head-note">修改会直接写入当前项目，确认后再提交到 Git。</p>
+      <button type="button" class="local-editor-close" data-local-editor-close aria-label="关闭内容编辑">×</button>
+    </header>
+
+    <nav class="local-editor-tabs" aria-label="内容分类">
+      <button type="button" data-editor-type="portfolio" aria-pressed="true">工业产品</button>
+      <button type="button" data-editor-type="poster" aria-pressed="false">平面设计</button>
+      <button type="button" data-editor-type="photography" aria-pressed="false">摄影作品</button>
+      <button type="button" data-editor-type="honor" aria-pressed="false">荣誉奖项</button>
+    </nav>
+
+    <div class="local-editor-body">
+      <aside class="local-editor-library" aria-label="内容列表">
+        <label class="local-editor-search">
+          <span>筛选内容</span>
+          <input type="search" placeholder="输入名称" data-editor-search />
+        </label>
+        <div class="local-editor-list" data-editor-list></div>
+      </aside>
+
+      <section class="local-editor-workspace">
+        <div class="local-editor-empty" data-editor-empty>
+          <p>从左侧选择一项内容开始编辑。</p>
+        </div>
+
+        <form class="local-editor-form" data-editor-form enctype="multipart/form-data" hidden>
+          <input type="hidden" name="contentType" data-editor-content-type />
+          <input type="hidden" name="id" data-editor-id />
+
+          <div class="local-editor-meta">
+            <span>Stable ID</span>
+            <code data-editor-id-label></code>
+          </div>
+
+          <div class="local-editor-form-layout">
+            <div class="local-editor-fields-wrap">
+              <section class="local-upload-fields" data-editor-fields="portfolio" hidden>
+                <div class="local-upload-grid">
+                  <label><span>产品名称</span><input name="title" type="text" required /></label>
+                  <label><span>产品年份</span><input name="year" type="text" required /></label>
+                </div>
+                <label>
+                  <span>产品类型</span>
+                  <select name="category" required>
+                    <option>3D 模型</option><option>产品设计</option><option>产品概念</option><option>界面设计</option>
+                  </select>
+                </label>
+                <label><span>产品简介</span><textarea name="summary" rows="5" required></textarea></label>
+                <label class="local-upload-file"><span>替换产品封面（可选）</span><input name="files" type="file" accept="image/*" /><small>不选择文件时保留当前封面。</small></label>
+              </section>
+
+              <section class="local-upload-fields" data-editor-fields="poster" hidden>
+                <div class="local-upload-grid">
+                  <label><span>作品名称</span><input name="title" type="text" required /></label>
+                  <label>
+                    <span>作品类型</span>
+                    <select name="category" required>
+                      <option>节庆视觉</option><option>专题宣传</option><option>校庆视觉</option>
+                      <option>校园视觉</option><option>栏目视觉</option><option>校友故事</option><option>周年专题</option>
+                    </select>
+                  </label>
+                </div>
+                <label><span>作品简介</span><textarea name="summary" rows="5" required></textarea></label>
+                <label class="local-upload-file"><span>替换作品图片（可选）</span><input name="files" type="file" accept="image/*" /><small>不选择文件时保留当前图片。</small></label>
+              </section>
+
+              <section class="local-upload-fields" data-editor-fields="photography" hidden>
+                <div class="local-upload-grid">
+                  <label><span>作品名称</span><input name="title" type="text" required /></label>
+                  <label><span>拍摄地点</span><input name="location" type="text" required /></label>
+                </div>
+                <label class="local-upload-file"><span>替换摄影图片（可选）</span><input name="files" type="file" accept="image/*" /><small>不选择文件时保留当前图片。</small></label>
+              </section>
+
+              <section class="local-upload-fields" data-editor-fields="honor" hidden>
+                <div class="local-upload-grid">
+                  <label><span>奖项年份</span><input name="year" type="text" required /></label>
+                  <label><span>奖项名称</span><input name="title" type="text" required /></label>
+                </div>
+                <label>
+                  <span>新材料处理方式</span>
+                  <select name="materialMode">
+                    <option value="keep">保留现有材料</option>
+                    <option value="append">追加到现有材料</option>
+                    <option value="replace">用新文件替换全部材料</option>
+                  </select>
+                </label>
+                <label class="local-upload-file"><span>上传新证明材料（可多选）</span><input name="files" type="file" multiple /><small>选择“替换”但不上传文件，会将状态改为待补充。</small></label>
+                <div class="local-editor-materials" data-editor-materials></div>
+              </section>
+            </div>
+
+            <figure class="local-editor-preview" data-editor-preview hidden>
+              <img src="" alt="当前资源预览" data-editor-preview-image />
+              <figcaption>当前资源</figcaption>
+            </figure>
+          </div>
+
+          <div class="local-upload-result" data-editor-result aria-live="polite"></div>
+          <footer class="local-editor-actions">
+            <span>保存后开发页面会自动读取最新内容。</span>
+            <button type="submit" class="local-upload-submit">保存修改</button>
+          </footer>
+        </form>
+      </section>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  type ContentType = "portfolio" | "poster" | "photography" | "honor";
+  type EditorItem = Record<string, any> & { id: string; title: string };
+  type EditorData = Record<ContentType, EditorItem[]>;
+
+  const editor = document.querySelector<HTMLDialogElement>("[data-local-editor-dialog]");
+  const editorForm = editor?.querySelector<HTMLFormElement>("[data-editor-form]");
+  const editorList = editor?.querySelector<HTMLElement>("[data-editor-list]");
+  const editorEmpty = editor?.querySelector<HTMLElement>("[data-editor-empty]");
+  const editorSearch = editor?.querySelector<HTMLInputElement>("[data-editor-search]");
+  const editorResult = editor?.querySelector<HTMLElement>("[data-editor-result]");
+  const editorPreview = editor?.querySelector<HTMLElement>("[data-editor-preview]");
+  const editorPreviewImage = editor?.querySelector<HTMLImageElement>("[data-editor-preview-image]");
+  const editorMaterials = editor?.querySelector<HTMLElement>("[data-editor-materials]");
+  const editorSubmit = editorForm?.querySelector<HTMLButtonElement>("button[type='submit']");
+  let editorData: EditorData | null = null;
+  let activeType: ContentType = "portfolio";
+  let activeItem: EditorItem | null = null;
+
+  const itemSecondary = (item: EditorItem) => {
+    if (activeType === "photography") return item.location;
+    return [item.year, item.category].filter(Boolean).join(" · ");
+  };
+
+  const setControlValue = (section: HTMLElement, name: string, value: string) => {
+    const control = section.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(`[name='${name}']`);
+    if (control) control.value = value ?? "";
+  };
+
+  const renderMaterials = (item: EditorItem) => {
+    if (!editorMaterials) return;
+    editorMaterials.replaceChildren();
+    const label = document.createElement("p");
+    label.textContent = "现有证明材料";
+    editorMaterials.append(label);
+    if (!item.materials?.length) {
+      const empty = document.createElement("span");
+      empty.textContent = "暂无材料";
+      editorMaterials.append(empty);
+      return;
+    }
+    item.materials.forEach((material: Record<string, string>) => {
+      const link = document.createElement("a");
+      link.href = material.src;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.textContent = `${material.label ?? "FILE"} · ${material.title}`;
+      editorMaterials.append(link);
+    });
+  };
+
+  const selectItem = (item: EditorItem) => {
+    if (!editor || !editorForm || !editorEmpty) return;
+    activeItem = item;
+    editorForm.reset();
+    editorForm.hidden = false;
+    editorEmpty.hidden = true;
+    const typeInput = editorForm.querySelector<HTMLInputElement>("[data-editor-content-type]");
+    const idInput = editorForm.querySelector<HTMLInputElement>("[data-editor-id]");
+    const idLabel = editorForm.querySelector<HTMLElement>("[data-editor-id-label]");
+    if (typeInput) typeInput.value = activeType;
+    if (idInput) idInput.value = item.id;
+    if (idLabel) idLabel.textContent = item.id;
+
+    editor.querySelectorAll<HTMLElement>("[data-editor-fields]").forEach((section) => {
+      const active = section.dataset.editorFields === activeType;
+      section.hidden = !active;
+      section.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("input, select, textarea").forEach((control) => {
+        control.disabled = !active;
+      });
+      if (!active) return;
+      setControlValue(section, "title", item.title);
+      setControlValue(section, "category", item.category);
+      setControlValue(section, "year", item.year);
+      setControlValue(section, "summary", item.summary);
+      setControlValue(section, "location", item.location);
+      setControlValue(section, "materialMode", "keep");
+    });
+
+    const image = activeType === "portfolio" ? item.cover : activeType === "honor" ? item.materials?.find((material: Record<string, string>) => material.kind === "image")?.src : item.src;
+    if (editorPreview && editorPreviewImage) {
+      editorPreview.hidden = !image;
+      if (image) {
+        editorPreviewImage.src = image;
+        editorPreviewImage.alt = `${item.title}当前资源`;
+      }
+    }
+    renderMaterials(item);
+    if (editorResult) {
+      editorResult.textContent = "";
+      editorResult.removeAttribute("data-state");
+    }
+    renderList();
+  };
+
+  const renderList = () => {
+    if (!editorList || !editorData) return;
+    const query = editorSearch?.value.trim().toLowerCase() ?? "";
+    editorList.replaceChildren();
+    editorData[activeType]
+      .filter((item) => `${item.title} ${itemSecondary(item)}`.toLowerCase().includes(query))
+      .forEach((item) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "local-editor-list-item";
+        button.dataset.active = String(activeItem?.id === item.id);
+        const strong = document.createElement("strong");
+        strong.textContent = item.title;
+        const span = document.createElement("span");
+        span.textContent = itemSecondary(item);
+        button.append(strong, span);
+        button.addEventListener("click", () => selectItem(item));
+        editorList.append(button);
+      });
+  };
+
+  const setType = (type: ContentType) => {
+    activeType = type;
+    activeItem = null;
+    if (editorForm) editorForm.hidden = true;
+    if (editorEmpty) editorEmpty.hidden = false;
+    editor?.querySelectorAll<HTMLButtonElement>("[data-editor-type]").forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.editorType === type));
+    });
+    renderList();
+  };
+
+  const loadEditorData = async () => {
+    const response = await fetch("/__local-content/data");
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.message || "内容读取失败");
+    editorData = payload.data;
+  };
+
+  const openEditor = async (selection?: { type: ContentType; id: string; title: string }) => {
+    if (!editor || !editorList) return;
+    editor.showModal();
+    editorList.textContent = "正在读取内容…";
+    try {
+      await loadEditorData();
+      setType(selection?.type ?? activeType);
+      if (selection && editorData) {
+        const item = editorData[selection.type].find((entry) => entry.id === selection.id || entry.title === selection.title);
+        if (item) selectItem(item);
+      }
+    } catch (error) {
+      editorList.textContent = error instanceof Error ? error.message : "内容读取失败";
+    }
+  };
+
+  let editorClicks = 0;
+  let editorClickTimer = 0;
+  document.addEventListener("click", (event) => {
+    if (event.button !== 0) return;
+    const trigger = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[data-local-editor-trigger]") : null;
+    if (!trigger) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    editorClicks += 1;
+    window.clearTimeout(editorClickTimer);
+    if (editorClicks >= 3) {
+      editorClicks = 0;
+      openEditor();
+      return;
+    }
+    editorClickTimer = window.setTimeout(() => {
+      editorClicks = 0;
+      const href = trigger.dataset.navHref || trigger.getAttribute("href") || "/";
+      window.location.href = href;
+    }, 460);
+  }, true);
+
+  editor?.querySelector("[data-local-editor-close]")?.addEventListener("click", () => editor.close());
+  editor?.querySelectorAll<HTMLButtonElement>("[data-editor-type]").forEach((button) => {
+    button.addEventListener("click", () => setType(button.dataset.editorType as ContentType));
+  });
+  editorSearch?.addEventListener("input", renderList);
+
+  editorForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!editorForm || !editorSubmit || !editorResult || !activeItem) return;
+    const requestData = new FormData(editorForm);
+    const savedTitle = String(requestData.get("title") ?? activeItem.title);
+    const reopenSelection = { type: activeType, id: activeItem.id, title: savedTitle };
+    sessionStorage.setItem("suisui-local-editor-reopen", JSON.stringify(reopenSelection));
+    editorSubmit.disabled = true;
+    editorSubmit.textContent = "正在保存…";
+    editorResult.textContent = "正在更新项目文件。";
+    editorResult.dataset.state = "working";
+    try {
+      const response = await fetch("/__local-content/update", { method: "POST", body: requestData });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.message || "保存失败");
+      await loadEditorData();
+      const nextItem = editorData?.[activeType].find((item) => item.id === activeItem?.id || item.title === savedTitle);
+      if (nextItem) selectItem(nextItem);
+      editorResult.textContent = `已保存：${payload.paths.join("、")}`;
+      editorResult.dataset.state = "success";
+    } catch (error) {
+      sessionStorage.removeItem("suisui-local-editor-reopen");
+      editorResult.textContent = error instanceof Error ? error.message : "保存失败，请检查开发终端。";
+      editorResult.dataset.state = "error";
+    } finally {
+      editorSubmit.disabled = false;
+      editorSubmit.textContent = "保存修改";
+    }
+  });
+
+  try {
+    const pending = sessionStorage.getItem("suisui-local-editor-reopen");
+    if (pending) {
+      sessionStorage.removeItem("suisui-local-editor-reopen");
+      window.setTimeout(() => openEditor(JSON.parse(pending)), 80);
+    }
+  } catch {}
+</script>
