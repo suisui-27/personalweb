@@ -1,6 +1,13 @@
 ---
 import "../styles/global.css";
 
+const LocalContentUploader = import.meta.env.DEV
+  ? (await import("../components/LocalContentUploader.astro")).default
+  : null;
+const LocalContentEditor = import.meta.env.DEV
+  ? (await import("../components/LocalContentEditor.astro")).default
+  : null;
+
 interface Props {
   title?: string;
   description?: string;
@@ -14,10 +21,10 @@ const siteTitle = "SuisuiGallery";
 const documentTitle = siteTitle;
 
 const navItems = [
-  ["/portfolio/", "工业产品"],
-  ["/posters/", "平面设计"],
-  ["/photography/", "摄影作品"],
-  ["/honors/", "个人成长"],
+  ["/portfolio/", "工业产品", "portfolio"],
+  ["/posters/", "平面设计", "poster"],
+  ["/photography/", "摄影作品", "photography"],
+  ["/honors/", "个人成长", "honor"],
 ];
 
 const isHome = Astro.url.pathname === "/";
@@ -44,12 +51,16 @@ const noPageScroll = Astro.url.pathname === "/posters/" || Astro.url.pathname ==
     <div class="site-shell">
       {!isHome && (
         <header class="site-header">
-          <a class="brand" href="/" aria-label="回到首页">
+          <a class="brand" href="/" aria-label="回到首页" data-local-editor-trigger={import.meta.env.DEV ? "true" : undefined}>
             <span>主页</span>
           </a>
           <nav class="site-nav" aria-label="主导航">
-            {navItems.map(([href, label]) => (
-              <a href={href} aria-current={Astro.url.pathname === href ? "page" : undefined}>{label}</a>
+            {navItems.map(([href, label, uploadType]) => (
+              <a
+                href={href}
+                aria-current={Astro.url.pathname === href ? "page" : undefined}
+                data-local-upload={import.meta.env.DEV ? uploadType : undefined}
+              >{label}</a>
             ))}
             <label class="theme-toggle" aria-label="切换深浅色主题">
               <input type="checkbox" data-theme-toggle />
@@ -73,6 +84,8 @@ const noPageScroll = Astro.url.pathname === "/posters/" || Astro.url.pathname ==
           </div>
         </div>
       </div>
+      {LocalContentUploader && <LocalContentUploader />}
+      {LocalContentEditor && <LocalContentEditor />}
     </div>
     <script>
       import { gsap } from "gsap";

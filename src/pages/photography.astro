@@ -2,19 +2,23 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { photographyItems } from "../data/photography";
 
-const photosJson = JSON.stringify(photographyItems);
-const firstPhoto = photographyItems[0];
+const photos = photographyItems.map((photo) => ({
+  ...photo,
+  displayName: `${photo.name} - ${photo.location}`,
+}));
+const photosJson = JSON.stringify(photos);
+const firstPhoto = photos[0];
 ---
 
 <BaseLayout title="摄影作品 | 个人作品集">
   <main class="photo-experience" data-photo-page>
     <div class="photo-control-row">
-      <h1 class="photo-current-name" data-photo-title>{firstPhoto.name}</h1>
+      <h1 class="photo-current-name" data-photo-title>{firstPhoto.displayName}</h1>
       <button class="photo-mode-button" type="button" data-photo-list-button>List</button>
     </div>
 
     <section class="photo-immersive-panel" data-photo-stage aria-live="polite">
-      <img class="photo-bg is-active" src={firstPhoto.src} alt={firstPhoto.name} data-photo-layer="0" />
+      <img class="photo-bg is-active" src={firstPhoto.src} alt={firstPhoto.displayName} data-photo-layer="0" />
       <img class="photo-bg" src="" alt="" aria-hidden="true" data-photo-layer="1" />
       <div class="asset-loader photo-stage-loader" aria-hidden="true">
         <div class="loader">
@@ -34,11 +38,11 @@ const firstPhoto = photographyItems[0];
 
     <section class="photo-list-panel" data-photo-list hidden>
       <div class="photo-list-grid">
-        {photographyItems.map((photo, index) => (
-          <button class="photo-list-item" type="button" data-photo-index={index} style={`--name-chars: ${Math.max(photo.name.length, 1)}`}>
-            <img src={photo.src} alt={photo.name} loading="lazy" />
+        {photos.map((photo, index) => (
+          <button class="photo-list-item" type="button" data-photo-index={index} style={`--name-chars: ${Math.max(photo.displayName.length, 1)}`}>
+            <img src={photo.src} alt={photo.displayName} loading="lazy" />
             <span>{String(index + 1).padStart(2, "0")}</span>
-            <strong>{photo.name}</strong>
+            <strong>{photo.displayName}</strong>
           </button>
         ))}
       </div>
@@ -118,9 +122,9 @@ const firstPhoto = photographyItems[0];
       nextImage.classList.remove("is-active", "is-entering", "is-leaving");
       currentImage.classList.remove("is-entering", "is-leaving");
       nextImage.src = nextPhoto.src;
-      nextImage.alt = nextPhoto.name;
+      nextImage.alt = nextPhoto.displayName;
       nextImage.removeAttribute("aria-hidden");
-      title.textContent = nextPhoto.name;
+      title.textContent = nextPhoto.displayName;
       currentIndex = normalizedIndex;
       markPhotoSeen(normalizedIndex);
       stage?.classList.remove("is-loading");
@@ -165,7 +169,7 @@ const firstPhoto = photographyItems[0];
     document.body.classList.remove("photo-list-open");
     if (!listPanel || !title || !listButton) return;
     listPanel.hidden = true;
-    title.textContent = photos[index]?.name || photos[currentIndex]?.name || "";
+    title.textContent = photos[index]?.displayName || photos[currentIndex]?.displayName || "";
     listButton.textContent = "List";
     showPhoto(index);
     schedule();

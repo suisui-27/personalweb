@@ -2,10 +2,10 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 const entries = [
-  { href: "/portfolio/", label: "工业产品" },
-  { href: "/posters/", label: "平面设计" },
-  { href: "/photography/", label: "摄影作品" },
-  { href: "/honors/", label: "个人成长" },
+  { href: "/portfolio/", label: "工业产品", uploadType: "portfolio" },
+  { href: "/posters/", label: "平面设计", uploadType: "poster" },
+  { href: "/photography/", label: "摄影作品", uploadType: "photography" },
+  { href: "/honors/", label: "个人成长", uploadType: "honor" },
 ];
 ---
 
@@ -25,7 +25,7 @@ const entries = [
 
       <nav class="landing-entries" aria-label="作品入口">
         {entries.map((item) => (
-          <a class="landing-entry" href={item.href}>
+          <a class="landing-entry" href={item.href} data-local-upload={import.meta.env.DEV ? item.uploadType : undefined}>
             <span class="entry-title"><span class="entry-dot" aria-hidden="true"></span>{item.label}</span>
             <span class="entry-arrow" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">

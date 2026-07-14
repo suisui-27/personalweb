@@ -4,6 +4,7 @@ interface PosterItem {
   src: string;
   title: string;
   category: string;
+  summary: string;
 }
 
 interface Props {
@@ -137,6 +138,7 @@ export default function PosterCarousel({ items }: Props) {
 
         <div className="poster-caption">
           <strong className="poster-title">{current.title} — {current.category}</strong>
+          <p className="poster-summary">{current.summary}</p>
         </div>
       </div>
 

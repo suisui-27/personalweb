@@ -1,0 +1,190 @@
+<dialog class="local-upload-dialog" data-local-upload-dialog aria-labelledby="local-upload-title">
+  <div class="local-upload-shell">
+    <header class="local-upload-head">
+      <div>
+        <p class="local-upload-kicker">Local Studio</p>
+        <h2 id="local-upload-title" data-local-upload-title>新增内容</h2>
+        <p data-local-upload-description>文件只会写入当前项目，随后可通过 Git 推送更新网站。</p>
+      </div>
+      <button class="local-upload-close" type="button" data-local-upload-close aria-label="关闭上传窗口">×</button>
+    </header>
+
+    <form class="local-upload-form" data-local-upload-form enctype="multipart/form-data">
+      <input type="hidden" name="contentType" data-local-upload-type />
+
+      <section class="local-upload-fields" data-upload-fields="portfolio" hidden>
+        <div class="local-upload-grid">
+          <label><span>产品名称</span><input name="title" type="text" required /></label>
+          <label>
+            <span>产品类型</span>
+            <select name="category" required>
+              <option value="">请选择</option>
+              <option>3D 模型</option>
+              <option>产品设计</option>
+              <option>产品概念</option>
+              <option>界面设计</option>
+            </select>
+          </label>
+          <label><span>产品年份</span><input name="year" type="text" inputmode="numeric" placeholder="2026" required /></label>
+          <label><span>URL 标识（可选）</span><input name="slug" type="text" placeholder="英文或数字" /></label>
+        </div>
+        <label><span>产品简介</span><textarea name="summary" rows="4" required></textarea></label>
+        <label class="local-upload-file"><span>产品封面</span><input name="files" type="file" accept="image/*" required /><small>建议使用清晰的 JPG、PNG 或 WebP。</small></label>
+      </section>
+
+      <section class="local-upload-fields" data-upload-fields="poster" hidden>
+        <div class="local-upload-grid">
+          <label><span>作品名称</span><input name="title" type="text" required /></label>
+          <label>
+            <span>作品类型</span>
+            <select name="category" required>
+              <option value="">请选择</option>
+              <option>节庆视觉</option><option>专题宣传</option><option>校庆视觉</option>
+              <option>校园视觉</option><option>栏目视觉</option><option>校友故事</option><option>周年专题</option>
+            </select>
+          </label>
+        </div>
+        <label><span>作品简介</span><textarea name="summary" rows="4" required></textarea></label>
+        <label class="local-upload-file"><span>作品图片</span><input name="files" type="file" accept="image/*" required /></label>
+      </section>
+
+      <section class="local-upload-fields" data-upload-fields="photography" hidden>
+        <div class="local-upload-grid">
+          <label><span>作品名称</span><input name="title" type="text" required /></label>
+          <label><span>拍摄地点</span><input name="location" type="text" placeholder="城市 · 具体地点" required /></label>
+        </div>
+        <label class="local-upload-file"><span>摄影图片</span><input name="files" type="file" accept="image/*" required /></label>
+      </section>
+
+      <section class="local-upload-fields" data-upload-fields="honor" hidden>
+        <div class="local-upload-grid">
+          <label><span>奖项年份</span><input name="year" type="text" placeholder="2026 或 2025-2026" required /></label>
+          <label><span>奖项名称</span><input name="title" type="text" required /></label>
+        </div>
+        <label class="local-upload-file">
+          <span>证明材料（可多选）</span>
+          <input name="files" type="file" multiple />
+          <small>支持图片、PDF、Word、PPT、Excel 等文件；暂缺材料时可留空。</small>
+        </label>
+      </section>
+
+      <div class="local-upload-result" data-local-upload-result aria-live="polite"></div>
+      <footer class="local-upload-actions">
+        <button type="button" class="local-upload-secondary" data-local-upload-cancel>取消</button>
+        <button type="submit" class="local-upload-submit">写入项目</button>
+      </footer>
+    </form>
+  </div>
+</dialog>
+
+<script>
+  type UploadType = "portfolio" | "poster" | "photography" | "honor";
+
+  const dialog = document.querySelector<HTMLDialogElement>("[data-local-upload-dialog]");
+  const form = dialog?.querySelector<HTMLFormElement>("[data-local-upload-form]");
+  const title = dialog?.querySelector<HTMLElement>("[data-local-upload-title]");
+  const description = dialog?.querySelector<HTMLElement>("[data-local-upload-description]");
+  const typeInput = dialog?.querySelector<HTMLInputElement>("[data-local-upload-type]");
+  const result = dialog?.querySelector<HTMLElement>("[data-local-upload-result]");
+  const submitButton = dialog?.querySelector<HTMLButtonElement>(".local-upload-submit");
+
+  const labels: Record<UploadType, { title: string; description: string }> = {
+    portfolio: { title: "新增工业产品", description: "保存基础资料与封面，并生成一份待 AI 深化的三级页面 MDX。" },
+    poster: { title: "新增平面设计", description: "图片写入平面作品目录，资料同步追加到作品清单。" },
+    photography: { title: "新增摄影作品", description: "名称与地点会组合为“名称 - 地点”显示。" },
+    honor: { title: "新增个人荣誉", description: "证明材料支持多种格式和多个文件，也可以稍后补充。" },
+  };
+
+  const closeDialog = () => {
+    if (dialog?.open) dialog.close();
+  };
+
+  const openDialog = (type: UploadType) => {
+    if (!dialog || !form || !typeInput) return;
+    form.reset();
+    typeInput.value = type;
+    if (title) title.textContent = labels[type].title;
+    if (description) description.textContent = labels[type].description;
+    if (result) {
+      result.textContent = "";
+      result.removeAttribute("data-state");
+    }
+
+    dialog.querySelectorAll<HTMLElement>("[data-upload-fields]").forEach((section) => {
+      const active = section.dataset.uploadFields === type;
+      section.hidden = !active;
+      section.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("input, select, textarea").forEach((control) => {
+        control.disabled = !active;
+      });
+    });
+    dialog.showModal();
+    window.setTimeout(() => dialog.querySelector<HTMLInputElement>("section:not([hidden]) input:not([type='hidden'])")?.focus(), 30);
+  };
+
+  let clickCount = 0;
+  let clickTimer = 0;
+  let clickTarget: HTMLAnchorElement | null = null;
+
+  document.addEventListener("click", (event) => {
+    if (event.button !== 0) return;
+    const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[data-local-upload]") : null;
+    if (!anchor) return;
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
+    if (clickTarget !== anchor) clickCount = 0;
+    clickTarget = anchor;
+    clickCount += 1;
+    window.clearTimeout(clickTimer);
+
+    if (clickCount >= 3) {
+      clickCount = 0;
+      const type = anchor.dataset.localUpload as UploadType;
+      openDialog(type);
+      return;
+    }
+
+    clickTimer = window.setTimeout(() => {
+      clickCount = 0;
+      const href = anchor.dataset.navHref || anchor.getAttribute("href");
+      if (!href) return;
+      const target = new URL(href, window.location.href);
+      if (target.pathname !== window.location.pathname || target.search !== window.location.search) {
+        window.location.href = target.href;
+      }
+    }, 460);
+  }, true);
+
+  dialog?.querySelectorAll("[data-local-upload-close], [data-local-upload-cancel]").forEach((button) => {
+    button.addEventListener("click", closeDialog);
+  });
+
+  dialog?.addEventListener("click", (event) => {
+    if (event.target === dialog) closeDialog();
+  });
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!form || !submitButton || !result) return;
+
+    submitButton.disabled = true;
+    submitButton.textContent = "正在写入…";
+    result.textContent = "正在保存文件和数据，请稍候。";
+    result.dataset.state = "working";
+
+    try {
+      const response = await fetch("/__local-content/upload", { method: "POST", body: new FormData(form) });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.message || "写入失败");
+      result.textContent = `已完成：${payload.paths.join("、")}。开发页面会自动读取最新内容。`;
+      result.dataset.state = "success";
+    } catch (error) {
+      result.textContent = error instanceof Error ? error.message : "写入失败，请检查开发终端。";
+      result.dataset.state = "error";
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "写入项目";
+    }
+  });
+</script>
