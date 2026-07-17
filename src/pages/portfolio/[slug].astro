@@ -12,6 +12,9 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
+const titleLength = Math.max(Array.from(entry.data.title).length, 1);
+const desktopTitleSize = Math.min(64, Math.max(24, 390 / titleLength));
+const mobileTitleSize = Math.min(44, Math.max(18, 320 / titleLength));
 ---
 
 <BaseLayout title={`${entry.data.title} | 作品`} description={entry.data.summary}>
@@ -20,7 +23,7 @@ const { Content } = await render(entry);
     <section class="article-hero">
       <div>
         <p class="eyebrow">{entry.data.category} / {entry.data.year}</p>
-        <h1 style={`--title-chars: ${Math.max(entry.data.title.length, 1)}`}>{entry.data.title}</h1>
+        <h1 style={`--project-title-size: ${desktopTitleSize}px; --project-title-size-mobile: ${mobileTitleSize}px`}>{entry.data.title}</h1>
         <p class="muted">{entry.data.summary}</p>
         <div class="tag-list">
           {entry.data.tags.map((tag) => <span>{tag}</span>)}

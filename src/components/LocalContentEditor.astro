@@ -106,7 +106,10 @@
           <div class="local-upload-result" data-editor-result aria-live="polite"></div>
           <footer class="local-editor-actions">
             <span>保存后开发页面会自动读取最新内容。</span>
-            <button type="submit" class="local-upload-submit">保存修改</button>
+            <div class="local-editor-action-buttons">
+              <button type="button" class="local-editor-delete" data-editor-delete>删除内容</button>
+              <button type="submit" class="local-upload-submit">保存修改</button>
+            </div>
           </footer>
         </form>
       </section>
@@ -129,6 +132,7 @@
   const editorPreviewImage = editor?.querySelector<HTMLImageElement>("[data-editor-preview-image]");
   const editorMaterials = editor?.querySelector<HTMLElement>("[data-editor-materials]");
   const editorSubmit = editorForm?.querySelector<HTMLButtonElement>("button[type='submit']");
+  const editorDelete = editorForm?.querySelector<HTMLButtonElement>("[data-editor-delete]");
   let editorData: EditorData | null = null;
   let activeType: ContentType = "portfolio";
   let activeItem: EditorItem | null = null;
@@ -287,10 +291,49 @@
   }, true);
 
   editor?.querySelector("[data-local-editor-close]")?.addEventListener("click", () => editor.close());
+  editor?.addEventListener("click", (event) => {
+    if (event.target === editor) editor.close();
+  });
   editor?.querySelectorAll<HTMLButtonElement>("[data-editor-type]").forEach((button) => {
     button.addEventListener("click", () => setType(button.dataset.editorType as ContentType));
   });
   editorSearch?.addEventListener("input", renderList);
+
+  editorDelete?.addEventListener("click", async () => {
+    if (!editorForm || !editorDelete || !editorResult || !activeItem) return;
+    const confirmed = window.confirm(`确定删除“${activeItem.title}”吗？相关数据和本地资源文件会一并删除，此操作需要通过 Git 才能撤销。`);
+    if (!confirmed) return;
+
+    const requestData = new FormData();
+    requestData.set("contentType", activeType);
+    requestData.set("id", activeItem.id);
+    editorDelete.disabled = true;
+    if (editorSubmit) editorSubmit.disabled = true;
+    editorDelete.textContent = "正在删除…";
+    editorResult.textContent = "正在删除数据和对应资源。";
+    editorResult.dataset.state = "working";
+    try {
+      const response = await fetch("/__local-content/delete", { method: "POST", body: requestData });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.message || "删除失败");
+      await loadEditorData();
+      activeItem = null;
+      editorForm.hidden = true;
+      if (editorEmpty) {
+        editorEmpty.hidden = false;
+        const message = editorEmpty.querySelector("p");
+        if (message) message.textContent = "内容已删除，请从左侧继续选择。";
+      }
+      renderList();
+    } catch (error) {
+      editorResult.textContent = error instanceof Error ? error.message : "删除失败，请检查开发终端。";
+      editorResult.dataset.state = "error";
+    } finally {
+      editorDelete.disabled = false;
+      if (editorSubmit) editorSubmit.disabled = false;
+      editorDelete.textContent = "删除内容";
+    }
+  });
 
   editorForm?.addEventListener("submit", async (event) => {
     event.preventDefault();

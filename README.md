@@ -33,6 +33,7 @@ pnpm preview
 personalweb/
   src/
     components/
+      LandingExperience.astro
       PosterCarousel.tsx
       ThreeAccent.tsx
       WorkCard.astro
@@ -66,7 +67,7 @@ personalweb/
 
 | 页面 | 路由 | 主要数据来源 | 当前设计 |
 | --- | --- | --- | --- |
-| 首页 | `/` | `src/pages/index.astro` | 四个入口组成首屏，使用首页背景与轻量 3D 点缀。 |
+| 首页 | `/` | `src/components/LandingExperience.astro` | 四个入口组成首屏；首访显示轻量图片，后续在图片和两个视频背景间随机。 |
 | 工业产品 | `/portfolio/` | `src/content/portfolio/*.mdx` | 作品卡片网格，卡片链接到三级详情页。 |
 | 工业产品详情 | `/portfolio/[slug]/` | `src/content/portfolio/*.mdx` | 与荣誉详情统一为 1060px 内容宽度；返回按钮对齐内容左侧；标题单行动态字号。 |
 | 平面设计 | `/posters/` | `src/data/posters.ts` | 无页面滚动的海报浏览体验，图片预加载并淡入淡出切换。 |
@@ -81,6 +82,17 @@ personalweb/
 - 二级与三级页面导航栏使用相同主题切换按钮。
 - 工业产品详情页和荣誉详情页共享 1060px 的主要内容宽度，返回按钮位于该内容宽度的左上角。
 - 三级详情页标题通过 `--title-chars` 动态调整字号，尽量保持单行。
+
+## 随机主页背景
+
+首页背景由 `src/components/LandingExperience.astro` 统一管理，候选项为当前图片、工作室视频和混凝土建筑视频。
+
+- 首次访问固定加载约 388 KB 的 `home-hero.jpg`，尽快显示首屏。
+- 后续访问使用保存在 `localStorage` 中的随机袋选择背景，三种背景均匀出现且不会连续重复。
+- 页面先完成选择，再创建对应的 `<img>` 或 `<video>`，一次访问只请求一套背景资源。
+- 开启节省流量、处于 2G 网络或偏好减少动态效果时，自动回退到静态图片。
+- 视频使用小体积 poster 立即占位；真实视频可播放后淡入，MP4 使用 `faststart` 便于渐进加载。
+- 固定预览入口为 `/video-preview/` 和 `/video-preview-2/`。
 
 ## 内容维护
 

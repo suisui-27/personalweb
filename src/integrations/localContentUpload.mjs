@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { Buffer } from "node:buffer";
 import { existsSync } from "node:fs";
-import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const root = process.cwd();
@@ -56,6 +56,30 @@ async function readJson(filename) {
 
 async function writeJson(filename, data) {
   await writeFile(filename, `${JSON.stringify(data, null, 2)}\n`, "utf8");
+}
+
+function resolvePublicAsset(src, allowedDirectory) {
+  if (typeof src !== "string" || !src.startsWith(allowedDirectory)) return null;
+  const publicRoot = path.resolve(root, "public");
+  const candidate = path.resolve(publicRoot, src.replace(/^\/+/, ""));
+  const allowedRoot = path.resolve(publicRoot, allowedDirectory.replace(/^\/+/, ""));
+  if (candidate !== allowedRoot && !candidate.startsWith(`${allowedRoot}${path.sep}`)) return null;
+  return candidate;
+}
+
+async function removePublicAsset(src, allowedDirectory) {
+  const filename = resolvePublicAsset(src, allowedDirectory);
+  if (filename) await rm(filename, { force: true });
+}
+
+async function removePortfolioAssetDirectory(src) {
+  const filename = resolvePublicAsset(src, "/assets/portfolio/");
+  if (!filename) return;
+  const portfolioRoot = path.resolve(root, "public/assets/portfolio");
+  const directory = path.dirname(filename);
+  if (directory !== portfolioRoot && directory.startsWith(`${portfolioRoot}${path.sep}`)) {
+    await rm(directory, { force: true, recursive: true });
+  }
 }
 
 function readFrontmatterScalar(source, field) {
@@ -312,6 +336,49 @@ async function updateContent(form) {
   return handler(form);
 }
 
+async function deletePortfolio(form) {
+  const id = path.basename(textField(form, "id"));
+  const filename = path.join(portfolioDirectory, `${id}.mdx`);
+  if (!existsSync(filename)) throw new Error("没有找到这项工业产品。");
+  const source = await readFile(filename, "utf8");
+  const cover = readFrontmatterScalar(source, "cover");
+  await rm(filename, { force: true });
+  await removePortfolioAssetDirectory(cover);
+
+  const idDirectory = path.resolve(root, "public/assets/portfolio", id);
+  const portfolioRoot = path.resolve(root, "public/assets/portfolio");
+  if (idDirectory.startsWith(`${portfolioRoot}${path.sep}`)) {
+    await rm(idDirectory, { force: true, recursive: true });
+  }
+  return [`src/content/portfolio/${id}.mdx`, cover].filter(Boolean);
+}
+
+async function deleteJsonItem(form, type) {
+  const id = textField(form, "id");
+  const filename = jsonPaths[type];
+  const items = await readJson(filename);
+  const index = items.findIndex((item) => type === "honor" ? item.slug === id : item.src === id);
+  if (index < 0) throw new Error("没有找到要删除的内容。");
+  const [removed] = items.splice(index, 1);
+  await writeJson(filename, items);
+
+  const assets = type === "honor" ? (removed.materials ?? []).map((material) => material.src) : [removed.src];
+  const allowedDirectory = type === "poster"
+    ? "/assets/posters/"
+    : type === "photography"
+      ? "/assets/photography/"
+      : "/assets/honors/";
+  await Promise.all(assets.map((src) => removePublicAsset(src, allowedDirectory)));
+  return [path.relative(root, filename).replaceAll("\\", "/"), ...assets].filter(Boolean);
+}
+
+async function deleteContent(form) {
+  const contentType = textField(form, "contentType");
+  if (contentType === "portfolio") return deletePortfolio(form);
+  if (["poster", "photography", "honor"].includes(contentType)) return deleteJsonItem(form, contentType);
+  throw new Error("未知的内容类型。");
+}
+
 async function parseForm(request) {
   const chunks = [];
   let size = 0;
@@ -366,6 +433,19 @@ export default function localContentUpload() {
             send(response, 200, { ok: true, paths });
           } catch (error) {
             send(response, 400, { message: error instanceof Error ? error.message : "更新失败。" });
+          }
+        });
+
+        server.middlewares.use("/__local-content/delete", async (request, response) => {
+          if (request.method !== "POST") {
+            send(response, 405, { message: "仅支持 POST 请求。" });
+            return;
+          }
+          try {
+            const paths = await deleteContent(await parseForm(request));
+            send(response, 200, { ok: true, paths });
+          } catch (error) {
+            send(response, 400, { message: error instanceof Error ? error.message : "删除失败。" });
           }
         });
 

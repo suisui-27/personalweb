@@ -2016,13 +2016,19 @@ h3 {
   border-bottom: 1px solid rgba(255, 253, 250, 0.14);
 }
 
+.project-detail-page .article-hero > div {
+  min-width: 0;
+}
+
 .project-detail-page .article-hero h1 {
   margin: 10px 0 14px;
-  font-size: clamp(18px, calc(min(1060px, calc(100vw - 44px)) / var(--title-chars) * 0.95), 72px);
+  max-width: 100%;
+  font-size: var(--project-title-size, 48px);
   font-weight: 500;
   line-height: 1.08;
   letter-spacing: 0;
   white-space: nowrap;
+  overflow: hidden;
 }
 
 .project-detail-page .article-hero .muted {
@@ -2627,7 +2633,7 @@ h3 {
   }
 
   .project-detail-page .article-hero h1 {
-    font-size: clamp(18px, calc(min(1060px, calc(100vw - 36px)) / var(--title-chars) * 0.95), 44px);
+    font-size: min(var(--project-title-size-mobile, 36px), 8.5vw);
   }
 
   .project-detail-page .article-hero img {
@@ -3557,6 +3563,13 @@ html[data-theme="light"] .honor-detail-page {
   cursor: pointer;
 }
 
+.local-editor-close:hover,
+.local-editor-close:focus-visible {
+  color: #fffdfa;
+  border-color: rgba(255, 253, 250, 0.5);
+  outline: 0;
+}
+
 .local-editor-tabs {
   display: flex;
   gap: 0;
@@ -3827,6 +3840,30 @@ html[data-theme="light"] .honor-detail-page {
   cursor: pointer;
 }
 
+.local-editor-action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.local-editor-delete {
+  color: #d9a5a0;
+  background: transparent;
+  border-color: rgba(217, 165, 160, 0.38) !important;
+}
+
+.local-editor-delete:hover,
+.local-editor-delete:focus-visible {
+  color: #fff;
+  background: #8d302b;
+  border-color: #8d302b !important;
+  outline: 0;
+}
+
+.local-editor-actions button:disabled {
+  opacity: 0.48;
+  cursor: wait;
+}
+
 html[data-theme="light"] .local-editor-dialog {
   color: #171717;
   background: #f5f5f7;
@@ -3852,6 +3889,22 @@ html[data-theme="light"] .local-editor-actions span {
 html[data-theme="light"] .local-editor-tabs button,
 html[data-theme="light"] .local-editor-list-item {
   color: rgba(23, 23, 23, 0.58);
+}
+
+html[data-theme="light"] .local-editor-close {
+  color: rgba(23, 23, 23, 0.72);
+  border-color: rgba(23, 23, 23, 0.24);
+}
+
+html[data-theme="light"] .local-editor-close:hover,
+html[data-theme="light"] .local-editor-close:focus-visible {
+  color: #171717;
+  border-color: rgba(23, 23, 23, 0.58);
+}
+
+html[data-theme="light"] .local-editor-delete {
+  color: #8d302b;
+  border-color: rgba(141, 48, 43, 0.38) !important;
 }
 
 html[data-theme="light"] .local-editor-tabs button[aria-pressed="true"],
@@ -3966,6 +4019,10 @@ html[data-theme="light"] .local-editor-preview {
   }
 
   .local-editor-actions button {
+    width: 100%;
+  }
+
+  .local-editor-action-buttons {
     width: 100%;
   }
 }
