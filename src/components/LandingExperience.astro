@@ -1,19 +1,20 @@
 ---
 interface Props {
   videoSrc?: string;
+  videoVariant?: "studio" | "motion";
   randomize?: boolean;
 }
 
-const { videoSrc, randomize = false } = Astro.props;
+const { videoSrc, videoVariant, randomize = false } = Astro.props;
 const imageSrc = "/assets/hero/home-hero.jpg";
 const videoVariants = {
   studio: {
     src: "/assets/hero/home-background-pingpong-pexels-7828922.mp4",
     poster: "/assets/hero/home-background-poster-pexels-7828922.jpg",
   },
-  architecture: {
-    src: "/assets/hero/home-background-pingpong-architecture-pexels-7311573.mp4",
-    poster: "/assets/hero/home-background-poster-architecture-pexels-7311573.jpg",
+  motion: {
+    src: "/assets/hero/home-background-wave-pexels-34128903.mp4",
+    poster: "/assets/hero/home-background-poster-wave-pexels-34128903.jpg",
   },
 };
 const entries = [
@@ -28,11 +29,12 @@ const entries = [
   <div
     class:list={["landing-media", { "has-video": Boolean(videoSrc) }]}
     data-landing-media={randomize ? "true" : undefined}
+    data-variant={videoVariant}
     data-image-src={randomize ? imageSrc : undefined}
     data-studio-src={randomize ? videoVariants.studio.src : undefined}
     data-studio-poster={randomize ? videoVariants.studio.poster : undefined}
-    data-architecture-src={randomize ? videoVariants.architecture.src : undefined}
-    data-architecture-poster={randomize ? videoVariants.architecture.poster : undefined}
+    data-motion-src={randomize ? videoVariants.motion.src : undefined}
+    data-motion-poster={randomize ? videoVariants.motion.poster : undefined}
     aria-hidden="true"
   >
     {videoSrc && (
@@ -75,7 +77,7 @@ const entries = [
       const media = document.querySelector("[data-landing-media]");
       if (!(media instanceof HTMLElement)) return;
 
-      const variants = ["image", "studio", "architecture"];
+      const variants = ["image", "studio", "motion"];
       const bagKey = "suisui-home-variant-bag-v1";
       const lastKey = "suisui-home-last-variant-v1";
 
@@ -125,8 +127,8 @@ const entries = [
       }
 
       const video = document.createElement("video");
-      const sourceKey = selected === "architecture" ? "architectureSrc" : "studioSrc";
-      const posterKey = selected === "architecture" ? "architecturePoster" : "studioPoster";
+      const sourceKey = selected === "motion" ? "motionSrc" : "studioSrc";
+      const posterKey = selected === "motion" ? "motionPoster" : "studioPoster";
       video.className = "landing-video is-ready";
       video.autoplay = true;
       video.muted = true;
@@ -196,6 +198,17 @@ const entries = [
     height: 110%;
     object-position: center center;
     transform: translateY(-9%);
+  }
+
+  .landing-media[data-variant="studio"] .landing-video {
+    height: 120%;
+    transform: translateY(-15%);
+  }
+
+  .landing-media[data-variant="motion"] .landing-video {
+    height: 100%;
+    filter: brightness(0.56) contrast(1.12);
+    transform: none;
   }
 
   .landing-overlay {

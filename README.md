@@ -85,7 +85,7 @@ personalweb/
 
 ## 随机主页背景
 
-首页背景由 `src/components/LandingExperience.astro` 统一管理，候选项为当前图片、工作室视频和混凝土建筑视频。
+首页背景由 `src/components/LandingExperience.astro` 统一管理，候选项为当前图片、工作室视频和 60fps 单色粒子曲面视频。
 
 - 每次访问都使用保存在 `localStorage` 中的随机袋选择背景，三种背景均匀出现且不会连续重复；无法使用本地存储时仍会即时随机。
 - 页面先完成选择，再创建对应的 `<img>` 或 `<video>`，一次访问只请求一套背景资源。
