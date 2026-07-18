@@ -1,7 +1,7 @@
 ---
 interface Props {
   videoSrc?: string;
-  videoVariant?: "studio" | "motion";
+  videoVariant?: "studio" | "motion" | "rain";
   randomize?: boolean;
 }
 
@@ -13,8 +13,8 @@ const videoVariants = {
     poster: "/assets/hero/home-background-poster-pexels-7828922.jpg",
   },
   motion: {
-    src: "/assets/hero/home-background-wave-pexels-34128903.mp4",
-    poster: "/assets/hero/home-background-poster-wave-pexels-34128903.jpg",
+    src: "/assets/hero/home-background-wave-pingpong-v2-pexels-34128903.mp4",
+    poster: "/assets/hero/home-background-poster-wave-v2-pexels-34128903.jpg",
   },
 };
 const entries = [
@@ -25,7 +25,11 @@ const entries = [
 ];
 ---
 
-<main class="landing" data-random-landing={randomize ? "true" : undefined}>
+<main
+  class="landing"
+  data-random-landing={randomize ? "true" : undefined}
+  data-landing-variant={videoVariant}
+>
   <div
     class:list={["landing-media", { "has-video": Boolean(videoSrc) }]}
     data-landing-media={randomize ? "true" : undefined}
@@ -76,6 +80,7 @@ const entries = [
     (() => {
       const media = document.querySelector("[data-landing-media]");
       if (!(media instanceof HTMLElement)) return;
+      const landing = media.closest("[data-random-landing]");
 
       const variants = ["image", "studio", "motion"];
       const bagKey = "suisui-home-variant-bag-v1";
@@ -106,11 +111,13 @@ const entries = [
       } catch {}
 
       media.dataset.variant = selected;
+      if (landing instanceof HTMLElement) landing.dataset.landingVariant = selected;
 
       const reveal = (element) => element.classList.add("is-ready");
       const mountImage = () => {
         media.classList.remove("has-video");
         media.dataset.variant = "image";
+        if (landing instanceof HTMLElement) landing.dataset.landingVariant = "image";
         const image = document.createElement("img");
         image.className = "landing-image";
         image.alt = "";
@@ -201,13 +208,20 @@ const entries = [
   }
 
   .landing-media[data-variant="studio"] .landing-video {
-    height: 120%;
-    transform: translateY(-15%);
+    height: 125%;
+    transform: translateY(-20%);
   }
 
   .landing-media[data-variant="motion"] .landing-video {
-    height: 100%;
+    width: 110%;
+    height: 110%;
     filter: brightness(0.56) contrast(1.12);
+    transform: translateY(-5%) scaleX(-1);
+  }
+
+  .landing-media[data-variant="rain"] .landing-video {
+    height: 100%;
+    filter: brightness(0.62) contrast(1.14);
     transform: none;
   }
 
@@ -431,54 +445,58 @@ const entries = [
       position: absolute;
       left: 50%;
       bottom: 10%;
-      width: 55vw;
+      width: min(55vw, 97.78vh);
       max-width: none;
       margin: 0;
       padding: 0;
       transform: translateX(-50%);
     }
 
+    .landing[data-landing-variant="studio"] .landing-content {
+      bottom: 17%;
+    }
+
     .landing-head {
-      margin-bottom: 4vmin;
+      margin-bottom: min(2.25vw, 4vh);
     }
 
     .landing-eyebrow {
-      margin-bottom: 1.5vmin;
-      padding-left: 1.4vmin;
-      font-size: 1.1vmin;
+      margin-bottom: min(0.84vw, 1.49vh);
+      padding-left: min(0.78vw, 1.39vh);
+      font-size: min(0.62vw, 1.1vh);
     }
 
     .landing-eyebrow::before {
-      width: 0.45vmin;
-      height: 0.45vmin;
+      width: min(0.25vw, 0.44vh);
+      height: min(0.25vw, 0.44vh);
     }
 
     .landing-title {
-      font-size: 5vmin;
+      font-size: min(2.82vw, 5.01vh);
       line-height: 1.22;
     }
 
     .landing-entries {
-      gap: 2.2vmin;
+      gap: min(1.24vw, 2.2vh);
     }
 
     .landing-entry {
-      padding-top: 0.75vmin;
-      padding-bottom: 1.25vmin;
+      padding-top: min(0.42vw, 0.75vh);
+      padding-bottom: min(0.7vw, 1.24vh);
     }
 
     .entry-title {
-      font-size: 1.8vmin;
+      font-size: min(1.02vw, 1.81vh);
     }
 
     .entry-arrow {
-      width: 3vmin;
-      height: 3vmin;
+      width: min(1.68vw, 2.99vh);
+      height: min(1.68vw, 2.99vh);
     }
 
     .entry-arrow svg {
-      width: 1.6vmin;
-      height: 1.6vmin;
+      width: min(0.9vw, 1.6vh);
+      height: min(0.9vw, 1.6vh);
     }
   }
 </style>
