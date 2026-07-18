@@ -1,7 +1,7 @@
 ---
 interface Props {
   videoSrc?: string;
-  videoVariant?: "studio" | "motion" | "rain";
+  videoVariant?: "studio" | "motion" | "architecture";
   randomize?: boolean;
 }
 
@@ -15,6 +15,10 @@ const videoVariants = {
   motion: {
     src: "/assets/hero/home-background-wave-pingpong-v2-pexels-34128903.mp4",
     poster: "/assets/hero/home-background-poster-wave-v2-pexels-34128903.jpg",
+  },
+  architecture: {
+    src: "/assets/hero/home-background-architecture-pingpong-pexels-35083676.mp4",
+    poster: "/assets/hero/home-background-poster-architecture-pexels-35083676.jpg",
   },
 };
 const entries = [
@@ -39,8 +43,8 @@ const entries = [
     data-studio-poster={randomize ? videoVariants.studio.poster : undefined}
     data-motion-src={randomize ? videoVariants.motion.src : undefined}
     data-motion-poster={randomize ? videoVariants.motion.poster : undefined}
-    data-rain-src={randomize ? "/assets/hero/home-background-rain-pingpong-pexels-37603101.mp4" : undefined}
-    data-rain-poster={randomize ? "/assets/hero/home-background-poster-rain-pexels-37603101.jpg" : undefined}
+    data-architecture-src={randomize ? videoVariants.architecture.src : undefined}
+    data-architecture-poster={randomize ? videoVariants.architecture.poster : undefined}
     aria-hidden="true"
   >
     {videoSrc && (
@@ -84,9 +88,9 @@ const entries = [
       if (!(media instanceof HTMLElement)) return;
       const landing = media.closest("[data-random-landing]");
 
-      const variants = ["image", "studio", "motion", "rain"];
-      const bagKey = "suisui-home-variant-bag-v2";
-      const lastKey = "suisui-home-last-variant-v2";
+      const variants = ["image", "studio", "motion", "architecture"];
+      const bagKey = "suisui-home-variant-bag-v3";
+      const lastKey = "suisui-home-last-variant-v3";
 
       const shuffle = (items) => {
         const result = [...items];
@@ -136,8 +140,8 @@ const entries = [
       }
 
       const video = document.createElement("video");
-      const sourceKey = selected === "motion" ? "motionSrc" : selected === "rain" ? "rainSrc" : "studioSrc";
-      const posterKey = selected === "motion" ? "motionPoster" : selected === "rain" ? "rainPoster" : "studioPoster";
+      const sourceKey = selected === "motion" ? "motionSrc" : selected === "architecture" ? "architectureSrc" : "studioSrc";
+      const posterKey = selected === "motion" ? "motionPoster" : selected === "architecture" ? "architecturePoster" : "studioPoster";
       video.className = "landing-video is-ready";
       video.autoplay = true;
       video.muted = true;
@@ -221,9 +225,9 @@ const entries = [
     transform: translateY(-5%) scaleX(-1);
   }
 
-  .landing-media[data-variant="rain"] .landing-video {
+  .landing-media[data-variant="architecture"] .landing-video {
     height: 100%;
-    filter: brightness(0.62) contrast(1.14);
+    filter: brightness(0.64) saturate(0.72) contrast(1.08);
     transform: none;
   }
 
@@ -454,10 +458,9 @@ const entries = [
       transform: translateX(-50%);
     }
 
-    .landing[data-landing-variant="studio"] .landing-content {
-      top: 50%;
-      bottom: auto;
-      transform: translate(-50%, -50%);
+    .landing-media[data-variant="studio"] .landing-video {
+      height: 155%;
+      transform: translateY(-36%);
     }
 
     .landing-head {
