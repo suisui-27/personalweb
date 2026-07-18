@@ -76,7 +76,6 @@ const entries = [
       if (!(media instanceof HTMLElement)) return;
 
       const variants = ["image", "studio", "architecture"];
-      const visitedKey = "suisui-home-visited-v1";
       const bagKey = "suisui-home-variant-bag-v1";
       const lastKey = "suisui-home-last-variant-v1";
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -94,29 +93,20 @@ const entries = [
         return result;
       };
 
-      let selected = "image";
+      let selected = variants[Math.floor(Math.random() * variants.length)];
       try {
-        const hasVisited = localStorage.getItem(visitedKey) === "true";
-        if (!hasVisited) localStorage.setItem(visitedKey, "true");
-
-        if (hasVisited && !prefersReducedMotion && !hasConstrainedNetwork) {
-          const lastVariant = localStorage.getItem(lastKey);
-          let bag = JSON.parse(localStorage.getItem(bagKey) || "[]");
-          if (!Array.isArray(bag) || bag.some((item) => !variants.includes(item)) || bag.length === 0) {
-            bag = shuffle(variants);
-            if (bag[0] === lastVariant && bag.length > 1) {
-              [bag[0], bag[1]] = [bag[1], bag[0]];
-            }
+        const lastVariant = localStorage.getItem(lastKey);
+        let bag = JSON.parse(localStorage.getItem(bagKey) || "[]");
+        if (!Array.isArray(bag) || bag.some((item) => !variants.includes(item)) || bag.length === 0) {
+          bag = shuffle(variants);
+          if (bag[0] === lastVariant && bag.length > 1) {
+            [bag[0], bag[1]] = [bag[1], bag[0]];
           }
-          selected = bag.shift() || "image";
-          localStorage.setItem(bagKey, JSON.stringify(bag));
-          localStorage.setItem(lastKey, selected);
-        } else {
-          localStorage.setItem(lastKey, selected);
         }
-      } catch {
-        selected = "image";
-      }
+        selected = bag.shift() || selected;
+        localStorage.setItem(bagKey, JSON.stringify(bag));
+        localStorage.setItem(lastKey, selected);
+      } catch {}
 
       media.dataset.variant = selected;
 
@@ -142,6 +132,20 @@ const entries = [
       const video = document.createElement("video");
       const sourceKey = selected === "architecture" ? "architectureSrc" : "studioSrc";
       const posterKey = selected === "architecture" ? "architecturePoster" : "studioPoster";
+
+      if (prefersReducedMotion || hasConstrainedNetwork) {
+        const poster = document.createElement("img");
+        poster.className = "landing-image landing-video-poster";
+        poster.alt = "";
+        poster.fetchPriority = "high";
+        poster.addEventListener("load", () => reveal(poster), { once: true });
+        poster.src = media.dataset[posterKey];
+        media.classList.add("has-video");
+        media.replaceChildren(poster);
+        if (poster.complete) reveal(poster);
+        return;
+      }
+
       video.className = "landing-video is-ready";
       video.autoplay = true;
       video.muted = true;
