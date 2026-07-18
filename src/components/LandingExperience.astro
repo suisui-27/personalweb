@@ -182,37 +182,38 @@ const entries = [
     background: #0c1012;
   }
 
-  .landing-image,
-  .landing-video {
+  .landing-media :global(.landing-image),
+  .landing-media :global(.landing-video) {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
-  [data-random-landing] .landing-image,
-  [data-random-landing] .landing-video {
+  [data-random-landing] :global(.landing-image),
+  [data-random-landing] :global(.landing-video) {
     opacity: 0;
     transition: opacity 420ms ease;
   }
 
-  [data-random-landing] .landing-image.is-ready,
-  [data-random-landing] .landing-video.is-ready {
+  [data-random-landing] :global(.landing-image.is-ready),
+  [data-random-landing] :global(.landing-video.is-ready) {
     opacity: 1;
   }
 
-  .landing-video {
+  .landing-media :global(.landing-video) {
     height: 110%;
     object-position: center center;
     transform: translateY(-9%);
   }
 
-  .landing-media[data-variant="studio"] .landing-video {
-    height: 125%;
-    transform: translateY(-20%);
+  .landing-media[data-variant="studio"] :global(.landing-video) {
+    height: 100%;
+    object-position: center top;
+    transform: none;
   }
 
-  .landing-media[data-variant="motion"] .landing-video {
+  .landing-media[data-variant="motion"] :global(.landing-video) {
     width: 110%;
     height: 110%;
     filter: brightness(0.56) contrast(1.12);
@@ -405,9 +406,10 @@ const entries = [
   }
 
   @media (min-width: 981px) {
-    .landing-media[data-variant="studio"] .landing-video {
-      height: 125%;
-      transform: translateY(-70%);
+    .landing-media[data-variant="studio"] :global(.landing-video) {
+      --studio-lift: 28vh;
+      height: calc(100% + var(--studio-lift));
+      transform: translateY(calc(-1 * var(--studio-lift)));
     }
 
     .landing-content {
