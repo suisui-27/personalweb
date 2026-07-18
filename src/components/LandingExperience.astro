@@ -405,6 +405,11 @@ const entries = [
   }
 
   @media (min-width: 981px) {
+    .landing-media[data-variant="studio"] .landing-video {
+      height: 125%;
+      transform: translateY(-70%);
+    }
+
     .landing-content {
       padding: 120px 56px 100px;
     }
@@ -444,11 +449,6 @@ const entries = [
       margin: 0;
       padding: 0;
       transform: translateX(-50%);
-    }
-
-    .landing-media[data-variant="studio"] .landing-video {
-      height: 125%;
-      transform: translateY(-40%);
     }
 
     .landing-head {
