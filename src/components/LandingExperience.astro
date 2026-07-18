@@ -39,6 +39,8 @@ const entries = [
     data-studio-poster={randomize ? videoVariants.studio.poster : undefined}
     data-motion-src={randomize ? videoVariants.motion.src : undefined}
     data-motion-poster={randomize ? videoVariants.motion.poster : undefined}
+    data-rain-src={randomize ? "/assets/hero/home-background-rain-pingpong-pexels-37603101.mp4" : undefined}
+    data-rain-poster={randomize ? "/assets/hero/home-background-poster-rain-pexels-37603101.jpg" : undefined}
     aria-hidden="true"
   >
     {videoSrc && (
@@ -82,9 +84,9 @@ const entries = [
       if (!(media instanceof HTMLElement)) return;
       const landing = media.closest("[data-random-landing]");
 
-      const variants = ["image", "studio", "motion"];
-      const bagKey = "suisui-home-variant-bag-v1";
-      const lastKey = "suisui-home-last-variant-v1";
+      const variants = ["image", "studio", "motion", "rain"];
+      const bagKey = "suisui-home-variant-bag-v2";
+      const lastKey = "suisui-home-last-variant-v2";
 
       const shuffle = (items) => {
         const result = [...items];
@@ -134,8 +136,8 @@ const entries = [
       }
 
       const video = document.createElement("video");
-      const sourceKey = selected === "motion" ? "motionSrc" : "studioSrc";
-      const posterKey = selected === "motion" ? "motionPoster" : "studioPoster";
+      const sourceKey = selected === "motion" ? "motionSrc" : selected === "rain" ? "rainSrc" : "studioSrc";
+      const posterKey = selected === "motion" ? "motionPoster" : selected === "rain" ? "rainPoster" : "studioPoster";
       video.className = "landing-video is-ready";
       video.autoplay = true;
       video.muted = true;
@@ -453,7 +455,9 @@ const entries = [
     }
 
     .landing[data-landing-variant="studio"] .landing-content {
-      bottom: 17%;
+      top: 50%;
+      bottom: auto;
+      transform: translate(-50%, -50%);
     }
 
     .landing-head {
