@@ -78,11 +78,6 @@ const entries = [
       const variants = ["image", "studio", "architecture"];
       const bagKey = "suisui-home-variant-bag-v1";
       const lastKey = "suisui-home-last-variant-v1";
-      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-      const hasConstrainedNetwork = Boolean(
-        connection?.saveData || ["slow-2g", "2g"].includes(connection?.effectiveType)
-      );
 
       const shuffle = (items) => {
         const result = [...items];
@@ -132,23 +127,11 @@ const entries = [
       const video = document.createElement("video");
       const sourceKey = selected === "architecture" ? "architectureSrc" : "studioSrc";
       const posterKey = selected === "architecture" ? "architecturePoster" : "studioPoster";
-
-      if (prefersReducedMotion || hasConstrainedNetwork) {
-        const poster = document.createElement("img");
-        poster.className = "landing-image landing-video-poster";
-        poster.alt = "";
-        poster.fetchPriority = "high";
-        poster.addEventListener("load", () => reveal(poster), { once: true });
-        poster.src = media.dataset[posterKey];
-        media.classList.add("has-video");
-        media.replaceChildren(poster);
-        if (poster.complete) reveal(poster);
-        return;
-      }
-
       video.className = "landing-video is-ready";
       video.autoplay = true;
       video.muted = true;
+      video.defaultMuted = true;
+      video.setAttribute("muted", "");
       video.loop = true;
       video.playsInline = true;
       video.preload = "auto";
@@ -157,7 +140,15 @@ const entries = [
       video.src = media.dataset[sourceKey];
       media.classList.add("has-video");
       media.replaceChildren(video);
-      video.play().catch(() => {});
+
+      const startVideo = () => video.play().catch(() => {});
+      video.addEventListener("canplay", startVideo);
+      document.addEventListener("pointerdown", startVideo, { once: true });
+      document.addEventListener("keydown", startVideo, { once: true });
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) startVideo();
+      });
+      startVideo();
     })();
   </script>
 )}

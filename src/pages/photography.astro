@@ -7,19 +7,18 @@ const photos = photographyItems.map((photo) => ({
   displayName: `${photo.name} - ${photo.location}`,
 }));
 const photosJson = JSON.stringify(photos);
-const firstPhoto = photos[0];
 ---
 
 <BaseLayout title="摄影作品 | 个人作品集">
   <main class="photo-experience" data-photo-page>
     <div class="photo-control-row">
-      <h1 class="photo-current-name" data-photo-title>{firstPhoto.displayName}</h1>
+      <h1 class="photo-current-name" data-photo-title></h1>
       <button class="photo-mode-button" type="button" data-photo-list-button>List</button>
     </div>
 
     <section class="photo-immersive-panel" data-photo-stage aria-live="polite">
-      <img class="photo-bg is-active" src={firstPhoto.src} alt={firstPhoto.displayName} data-photo-layer="0" />
-      <img class="photo-bg" src="" alt="" aria-hidden="true" data-photo-layer="1" />
+      <img class="photo-bg is-active" alt="" data-photo-layer="0" />
+      <img class="photo-bg" alt="" aria-hidden="true" data-photo-layer="1" />
       <div class="asset-loader photo-stage-loader" aria-hidden="true">
         <div class="loader">
           <div class="cube">
@@ -62,6 +61,7 @@ const firstPhoto = photos[0];
   const listButton = document.querySelector("[data-photo-list-button]");
   const nextButton = document.querySelector("[data-photo-random-next]");
   const listItems = document.querySelectorAll("[data-photo-index]");
+  const lastPhotoKey = "suisui-photography-last-index-v1";
   let currentIndex = 0;
   let activeLayer = 0;
   let timer = 0;
@@ -85,10 +85,38 @@ const firstPhoto = photos[0];
     remainingIndices = remainingIndices.filter((item) => item !== index);
   };
 
-  photos.forEach((photo) => {
-    const preload = new Image();
-    preload.src = photo.src;
-  });
+  const rememberPhoto = (index) => {
+    try {
+      localStorage.setItem(lastPhotoKey, String(index));
+    } catch {}
+  };
+
+  const getInitialRandomIndex = () => {
+    if (photos.length <= 1) return 0;
+    let lastIndex = -1;
+    try {
+      const storedIndex = localStorage.getItem(lastPhotoKey);
+      if (storedIndex !== null) lastIndex = Number(storedIndex);
+    } catch {}
+    const candidates = photos
+      .map((_, index) => index)
+      .filter((index) => !Number.isInteger(lastIndex) || index !== lastIndex);
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  };
+
+  const mountInitialPhoto = () => {
+    if (photos.length === 0 || imageLayers.length === 0 || !title) return;
+    currentIndex = getInitialRandomIndex();
+    const photo = photos[currentIndex];
+    const image = imageLayers[0];
+    title.textContent = photo.displayName;
+    image.alt = photo.displayName;
+    stage?.classList.add("is-loading");
+    image.addEventListener("load", () => stage?.classList.remove("is-loading"), { once: true });
+    image.addEventListener("error", () => stage?.classList.remove("is-loading"), { once: true });
+    image.src = photo.src;
+    rememberPhoto(currentIndex);
+  };
 
   const schedule = () => {
     window.clearInterval(timer);
@@ -126,6 +154,7 @@ const firstPhoto = photos[0];
       nextImage.removeAttribute("aria-hidden");
       title.textContent = nextPhoto.displayName;
       currentIndex = normalizedIndex;
+      rememberPhoto(currentIndex);
       markPhotoSeen(normalizedIndex);
       stage?.classList.remove("is-loading");
       void nextImage.offsetWidth;
@@ -190,6 +219,7 @@ const firstPhoto = photos[0];
     });
   });
 
+  mountInitialPhoto();
   refillRemaining(currentIndex);
   schedule();
 </script>
